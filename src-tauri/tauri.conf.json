@@ -55,10 +55,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
         "resizable": true,
-        "title": "lifelog",
-        "width": 800
+        "title": "Lifelog",
+        "height": 800,
+        "width": 1000
       }
     ]
   }

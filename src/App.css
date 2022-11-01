@@ -1,7 +1,18 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
+.panel {
+  height: 100vh;
+  width: 50vw;
+}
+
+.left-panel {
+  background-color: #000;
+}
+
+.right-panel {
+  background-color: #fff;
 }
