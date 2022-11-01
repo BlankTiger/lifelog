@@ -1,6 +1,6 @@
-import { Divider } from "@chakra-ui/react";
+import { Accordion, Divider } from "@chakra-ui/react";
 import { invoke } from "@tauri-apps/api/tauri";
-import { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { Entry, EntryProps } from "./Entry";
 
 const LeftPanel = () => {
@@ -12,16 +12,19 @@ const LeftPanel = () => {
       .catch((error) => console.log(error));
   }, []);
 
+  let calendarEntries = entries.map((entry) => {
+    return (
+      <React.Fragment key={entry.id}>
+        <Entry {...entry} />
+      </React.Fragment>
+    );
+  });
+
   return (
     <div className="left-panel panel">
-      {entries.map((entry) => {
-        return (
-          <>
-            <Entry {...entry} />
-            <Divider />
-          </>
-        );
-      })}
+      <Accordion allowToggle>
+        {calendarEntries}
+      </Accordion>
     </div>
   );
 }

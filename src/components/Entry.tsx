@@ -1,6 +1,7 @@
-import { Button } from "@chakra-ui/react";
+import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Button, Heading } from "@chakra-ui/react";
 
 export interface EntryProps {
+  id: Number;
   title: String;
   desc: String;
   start_time: String;
@@ -8,5 +9,19 @@ export interface EntryProps {
 }
 
 export const Entry = (props: EntryProps): JSX.Element => {
-  return <Button colorScheme="teal" size="sm">{props.title + " " + props.start_time}</Button>;
+  return (
+    <AccordionItem key="{props.title}">
+      <Heading>
+        <AccordionButton fontWeight="bold">
+          <Box flex="1" textAlign="left">
+            {props.title}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+      </Heading>
+      <AccordionPanel>
+        {props.desc}
+      </AccordionPanel>
+    </AccordionItem >
+  );
 }

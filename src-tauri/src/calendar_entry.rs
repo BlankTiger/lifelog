@@ -5,6 +5,7 @@ use std::fs;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Entry {
+    id: i64,
     title: String,
     desc: String,
     start_time: DateTime<Local>,
