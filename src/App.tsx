@@ -3,8 +3,7 @@ import "./App.css";
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
 
-function App() {
-
+const App = () => {
   return (
     <div className="container">
       <LeftPanel />

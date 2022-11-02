@@ -1,7 +1,9 @@
-import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading, Spacer } from "@chakra-ui/react";
+import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading } from "@chakra-ui/react";
 import { CalendarEntry } from "./CalendarEntry";
 
 export const Entry = (props: CalendarEntry): JSX.Element => {
+  const desc = props.desc.replace("\\n", "\n");
+
   const start = new Date(props.start);
   const startHours = start.getHours() > 10 ? start.getHours() : "0" + start.getHours();
   const startMinutes = start.getMinutes() > 10 ? start.getMinutes() : "0" + start.getMinutes();
@@ -14,7 +16,7 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
   const endTime = endHours + ":" + endMinutes;
 
   return (
-    <AccordionItem key="{props.title}">
+    <AccordionItem key={props.id}>
       <Heading>
         <AccordionButton fontWeight="bold">
           <Box flex="1" textAlign="left">
@@ -31,7 +33,9 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
         </AccordionButton>
       </Heading>
       <AccordionPanel>
-        {props.desc}
+        <div className="display-linebreak">
+          {desc}
+        </div>
       </AccordionPanel>
     </AccordionItem >
   );

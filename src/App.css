@@ -33,3 +33,6 @@
   right: 2vh;
 }
 
+.display-linebreak {
+  white-space: pre-line;
+}
