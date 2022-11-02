@@ -1,12 +1,12 @@
 import { Flex, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-export type TimerProps = {
+export type ActualTimerProps = {
   timerTitle: string,
-  startTime: string,
+  isRunning: boolean,
 };
 
-export const Timer = ({ timerTitle, startTime }: TimerProps): JSX.Element => {
+export const ActualTimer = ({ timerTitle, isRunning }: ActualTimerProps): JSX.Element => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -21,21 +21,21 @@ export const Timer = ({ timerTitle, startTime }: TimerProps): JSX.Element => {
     setShownTime(time);
   };
 
-
   const getTime = () => {
-    let startDate = new Date(startTime);
-
-    setElapsedTime(Date.now() - startDate.getTime());
-    setSeconds(Math.floor(elapsedTime / 1000 % 60));
-    setMinutes(Math.floor(elapsedTime / 1000 / 60 % 60));
-    setHours(Math.floor(elapsedTime / 1000 / 60 / 60));
-    recalculateShownTime();
+    if (isRunning) {
+      setElapsedTime(elapsedTime + 1);
+      setSeconds(Math.floor(elapsedTime % 60));
+      setMinutes(Math.floor(elapsedTime / 60 % 60));
+      setHours(Math.floor(elapsedTime / 60 / 60));
+      recalculateShownTime();
+    }
   };
 
   useEffect(() => {
     const interval = setInterval(() => getTime(), 1000);
     return () => clearInterval(interval);
   });
+
 
   return (
     <>

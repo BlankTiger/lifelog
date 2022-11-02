@@ -1,6 +1,7 @@
 import { Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import { Timer, TimerProps } from "./Timer";
+import { ActualTimer, ActualTimerProps } from "./ActualTimer";
 import { ResumeButton } from "./ResumeButton";
 import { PauseButton } from "./PauseButton";
 import { useColorMode } from "@chakra-ui/react";
@@ -20,22 +21,20 @@ const RightPanel = () => {
 
   let timerProps = {
     timerTitle: "Elapsed",
-    startTime: "2022-11-01T18:55:00.511Z",
-    isRunning: true,
+    startTime: "2022-11-01T20:50:00.511Z",
   } as TimerProps;
 
   let timerPropsActual = {
     timerTitle: "Actual",
-    startTime: "2022-11-01T18:55:00.511Z",
     isRunning: isRunning,
-  } as TimerProps;
+  } as ActualTimerProps;
 
   return (
     <>
       <div className="right-panel panel">
         <Flex direction="row" gap="3vw">
           <Timer {...timerProps} />
-          <Timer {...timerPropsActual} />
+          <ActualTimer {...timerPropsActual} />
         </Flex>
         <Flex direction="row" gap="3vw">
           <ResumeButton onClick={setResumed} />
