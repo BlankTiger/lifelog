@@ -1,14 +1,16 @@
-import { Accordion } from "@chakra-ui/react";
+import { Accordion, Spacer } from "@chakra-ui/react";
 import { invoke } from "@tauri-apps/api/tauri";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { Entry } from "./Entry";
 import { Today } from "./Today";
+import { CalendarViewSelector, CalendarView } from "./CalendarViewSelector";
 
 const LeftPanel = () => {
   let now = new Date().toISOString();
   let t_index = now.indexOf("T");
 
   const [dailyEntries, setDailyEntries] = useState({});
+  const [calendarView, setCalendarView] = useState(CalendarView.daily);
   const today = now.substring(0, t_index);
 
 
@@ -29,6 +31,17 @@ const LeftPanel = () => {
     generateDailyEntries();
   }, []);
 
+  const changeCalendarView = () => {
+    let newCalendarView = CalendarView.daily;
+    if (calendarView === CalendarView.daily) {
+      newCalendarView = CalendarView.weekly; 
+    } else if (calendarView === CalendarView.weekly) {
+      newCalendarView = CalendarView.monthly;
+    }
+    setCalendarView(newCalendarView);
+    console.log(calendarView);
+  }
+
   return (
     <div className="left-panel panel">
       <Today today={today} />
@@ -41,6 +54,8 @@ const LeftPanel = () => {
           );
         })}
       </Accordion>
+      <Spacer />
+      <CalendarViewSelector title={calendarView} onClick={changeCalendarView} />
     </div>
   );
 }
