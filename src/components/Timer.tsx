@@ -14,7 +14,7 @@ export const Timer = ({ timerTitle, startTime }: TimerProps): JSX.Element => {
   const [shownTime, setShownTime] = useState("00:00");
 
   const recalculateShownTime = () => {
-    let shownHours = hours > 0 ? hours > 10 ? "0" + hours + ":" : hours + ":" : "";
+    let shownHours = hours > 0 ? hours < 10 ? "0" + hours + ":" : hours + ":" : "";
     let shownMinutes = minutes < 10 ? "0" + minutes : minutes;
     let shownSeconds = seconds < 10 ? "0" + seconds : seconds;
     let time = `${shownHours}${shownMinutes}:${shownSeconds}`;

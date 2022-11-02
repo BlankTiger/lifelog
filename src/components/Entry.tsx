@@ -1,20 +1,31 @@
-import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Button, Heading } from "@chakra-ui/react";
+import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading, Spacer } from "@chakra-ui/react";
+import { CalendarEntry } from "./CalendarEntry";
 
-export interface EntryProps {
-  id: Number;
-  title: String;
-  desc: String;
-  start_time: String;
-  end_time: String;
-}
+export const Entry = (props: CalendarEntry): JSX.Element => {
+  const start = new Date(props.start);
+  const startHours = start.getHours() > 10 ? start.getHours() : "0" + start.getHours();
+  const startMinutes = start.getMinutes() > 10 ? start.getMinutes() : "0" + start.getMinutes();
 
-export const Entry = (props: EntryProps): JSX.Element => {
+  const end = new Date(props.end);
+  const endHours = end.getHours() > 10 ? end.getHours() : "0" + end.getHours();
+  const endMinutes = end.getMinutes() > 10 ? end.getMinutes() : "0" + end.getMinutes();
+
+  const startTime = startHours + ":" + startMinutes;
+  const endTime = endHours + ":" + endMinutes;
+
   return (
     <AccordionItem key="{props.title}">
       <Heading>
         <AccordionButton fontWeight="bold">
           <Box flex="1" textAlign="left">
-            {props.title}
+            <Flex direction="row" justify="flex-end">
+              <Box flex="1" textAlign="left">
+                {props.title}
+              </Box>
+              <Box flex="1" textAlign="right">
+                {startTime}{" - "}{endTime}
+              </Box>
+            </Flex>
           </Box>
           <AccordionIcon />
         </AccordionButton>
