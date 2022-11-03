@@ -25,11 +25,11 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
 
 
   return (
-    <AccordionItem key={props.id} bgGradient={active ? "linear(to-l, #7928CA, #FF0080)" : ""} rounded={15}>
+    <AccordionItem key={props.id} border="1px" bgGradient={active ? "linear(to-l, #7928CA, #FF0080)" : ""} rounded={15}>
       <Heading>
         <AccordionButton fontWeight="bold">
           <Box flex="1" textAlign="left">
-            <Flex direction="row" justify="flex-end">
+            <Flex direction="row" justify="space-between" align="center">
               <Box flex="2" textAlign="left">
                 {props.summary}
               </Box>
@@ -45,7 +45,7 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
         <div className="display-linebreak">
           {desc}
           <br />
-          <Flex direction="column" justify="space-between" mt={3}>
+          <Flex direction="column" justify="space-between" mt={5}>
             <>
               <Flex direction="row" justify="space-between">
                 <>
