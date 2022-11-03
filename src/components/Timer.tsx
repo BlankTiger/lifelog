@@ -15,8 +15,8 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
   const [dailyEntries, setDailyEntries] = useState([]);
   const [currentEntryStart, setCurrentEntry] = useEntryStore(state =>
     [state.currentEntryStart, state.setCurrentEntry]);
-  const entries = useDailyEntriesStore(state => state.dailyEntries);
-  const today = useTodayStore(state => state.today);
+  const entries: any = useDailyEntriesStore(state => state.dailyEntries);
+  const todayShowable = useTodayStore(state => state.todayShowable);
 
   const recalculateShownTime = () => {
     let shownHours = hours > 0 ? hours < 10 ? "0" + hours + ":" : hours + ":" : "";
@@ -58,9 +58,13 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     return () => clearInterval(interval);
   });
 
+  type EntriesObject = {
+    [key: string]: []
+  }
+
   useEffect(() => {
-    entries.then(entries => setDailyEntries(entries[today]));
-  }, []);
+    entries.then((entries: EntriesObject) => setDailyEntries(entries[todayShowable]));
+  }, [todayShowable]);
 
   return (
     <>

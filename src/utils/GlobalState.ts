@@ -1,10 +1,6 @@
 import create from "zustand";
 import { invoke } from "@tauri-apps/api";
 
-let now = new Date().toLocaleString("pl-PL");
-let day = new Date().getDay();
-const today = day < 10 ? "0" + now.split(",")[0] : now.split(",")[0];
-
 const generateDailyEntries = async () => {
   return await invoke("generate_from_file")
     .then(entries => entries)
@@ -38,13 +34,21 @@ export const useDailyEntriesStore = create<DailyEntriesState>()((set) => ({
 }));
 
 interface TodayState {
-  today: string;
-  setToday: (newToday: string) => void;
+  today: Date;
+  todayShowable: string;
+  setToday: (newToday: Date) => void;
+}
+
+const showableDateFix = (date: Date) => {
+  let baseShowableDate = new Date(date).toLocaleString("pl-PL").split(",")[0];
+  let fixedShowableDate = date.getDate() >= 10 ? baseShowableDate : "0" + baseShowableDate;
+  return fixedShowableDate;
 }
 
 export const useTodayStore = create<TodayState>()((set) => ({
-  today: today,
-  setToday: (newToday) => set(() => ({ today: newToday })),
+  today: new Date(),
+  todayShowable: showableDateFix(new Date()),
+  setToday: (newToday) => set(() => ({ today: newToday, todayShowable: showableDateFix(newToday) })),
 }));
 
 interface ElapsedTimeState {
@@ -68,4 +72,3 @@ export const useElapsedTimeStore = create<ElapsedTimeState>()((set) => ({
   pushPauseTime: (pauseTime) => set((state) => ({ pauseTimes: [...state.pauseTimes, pauseTime] })),
   clearPauseTimes: () => set(() => ({ pauseTimes: [] })),
 }));
-
