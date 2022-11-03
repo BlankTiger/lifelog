@@ -1,32 +1,15 @@
 use crate::command_result::CommandResult;
-use chrono::{DateTime, Local};
-use serde::{Deserialize, Serialize};
+use crate::calendar::CalendarEntry;
 use std::collections::HashMap;
 use tokio::fs;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct PauseTime {
-    elapsed_time: i64,
-    actual_time: i64,
-    current_time: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Entry {
-    id: i64,
-    title: String,
-    desc: String,
-    start: DateTime<Local>,
-    end: DateTime<Local>,
-    pause_times: Vec<PauseTime>,
-}
-
 #[tauri::command]
-pub async fn generate_from_file() -> CommandResult<HashMap<String, Vec<Entry>>> {
-    let file = fs::read_to_string("./entries.json")
+pub async fn generate_from_file() -> CommandResult<HashMap<String, Vec<CalendarEntry>>> {
+    let file = fs::read_to_string("./rozklad.json")
         .await
         .expect("Can read file");
-    let entries: HashMap<String, Vec<Entry>> =
+    let entries: HashMap<String, Vec<CalendarEntry>> =
         serde_json::from_str(&file).expect("Converted to json");
+    dbg!(&entries.get("03.11.2022").unwrap()[0].start);
     Ok(entries)
 }

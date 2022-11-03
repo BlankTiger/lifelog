@@ -2,7 +2,8 @@ import create from "zustand";
 import { invoke } from "@tauri-apps/api";
 
 let now = new Date().toLocaleString("pl-PL");
-const today = now.split(",")[0];
+let day = new Date().getDay();
+const today = day < 10 ? "0" + now.split(",")[0] : now.split(",")[0];
 
 const generateDailyEntries = async () => {
   return await invoke("generate_from_file")

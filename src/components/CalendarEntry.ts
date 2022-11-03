@@ -1,10 +1,12 @@
 export interface CalendarEntry {
   id: number,
-  title: string;
-  desc: string;
+  description: string;
   start: Date;
   end: Date;
-  pause_times: PauseTimes[];
+  summary: string;
+  location: string;
+  status: string;
+  entry_type: string;
 }
 
 export interface PauseTimes {

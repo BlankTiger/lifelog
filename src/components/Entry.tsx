@@ -1,12 +1,12 @@
 import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading } from "@chakra-ui/react";
 import { CalendarEntry } from "./CalendarEntry";
 import { useEntryStore } from "../utils/GlobalState";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 export const Entry = (props: CalendarEntry): JSX.Element => {
   const currentEntry = useEntryStore((state) => state.currentEntry);
   const [active, setActive] = useState(false);
-  const desc = props.desc.replace("\\n", "\n");
+  const desc = props.description.replace("\\n", "\n");
 
   const start = new Date(props.start);
   const startHours = start.getHours() >= 10 ? start.getHours() : "0" + start.getHours();
@@ -30,8 +30,8 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
         <AccordionButton fontWeight="bold">
           <Box flex="1" textAlign="left">
             <Flex direction="row" justify="flex-end">
-              <Box flex="1" textAlign="left">
-                {props.title}
+              <Box flex="2" textAlign="left">
+                {props.summary}
               </Box>
               <Box flex="1" textAlign="right">
                 {startTime}{" - "}{endTime}
@@ -44,6 +44,15 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
       <AccordionPanel>
         <div className="display-linebreak">
           {desc}
+          <br />
+          <Heading size="sm">
+            {"\nLocation: "}
+          </ Heading>
+          {props.location}
+          <Heading size="sm">
+            {"\nCategory: "}
+          </ Heading>
+          {props.entry_type}
         </div>
       </AccordionPanel>
     </AccordionItem >
