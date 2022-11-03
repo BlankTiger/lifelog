@@ -1,5 +1,6 @@
 import { Flex, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { useElapsedTimeStore } from "../utils/GlobalState";
 
 export type ActualTimerProps = {
   timerTitle: string,
@@ -7,7 +8,8 @@ export type ActualTimerProps = {
 };
 
 export const ActualTimer = ({ timerTitle, isRunning }: ActualTimerProps): JSX.Element => {
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useElapsedTimeStore(state =>
+    [state.elapsedTime, state.setElapsedTime])
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);

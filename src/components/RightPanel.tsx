@@ -6,22 +6,30 @@ import { ResumeButton } from "./ResumeButton";
 import { PauseButton } from "./PauseButton";
 import { useColorMode } from "@chakra-ui/react";
 import { ThemeToggler } from "./ThemeToggler";
+import { useElapsedTimeStore } from "../utils/GlobalState";
 
 const RightPanel = () => {
   const [isRunning, setRunning] = useState(false);
   const { colorMode, toggleColorMode } = useColorMode();
+  const [pushResumeTime, pushStopTime] = useElapsedTimeStore(state => 
+    [state.pushResumeTime, state.pushPauseTime]);
 
   const setResumed = () => {
+    if (!isRunning) {
+      pushResumeTime(new Date());
+    }
     setRunning(true);
   }
 
   const setPaused = () => {
+    if (isRunning) {
+      pushStopTime(new Date());
+    }
     setRunning(false);
   }
 
   let timerProps = {
     timerTitle: "Elapsed",
-    startTime: "2022-11-01T20:50:00.511Z",
   } as TimerProps;
 
   let timerPropsActual = {

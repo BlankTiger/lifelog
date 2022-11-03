@@ -1,40 +1,20 @@
-import { Accordion, Spacer } from "@chakra-ui/react";
-import { invoke } from "@tauri-apps/api/tauri";
-import React, { SetStateAction, useEffect, useState } from "react";
+import { Accordion, Box, Spacer } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 import { Entry } from "./Entry";
 import { Today } from "./Today";
 import { CalendarViewSelector, CalendarView } from "./CalendarViewSelector";
+import { useDailyEntriesStore, useTodayStore } from "../utils/GlobalState";
 
 const LeftPanel = () => {
-  let now = new Date().toISOString();
-  let t_index = now.indexOf("T");
-
-  const [dailyEntries, setDailyEntries] = useState({});
+  const [dailyEntries, setDailyEntries] = useState([]);
   const [calendarView, setCalendarView] = useState(CalendarView.daily);
-  const today = now.substring(0, t_index);
-
-
-  useEffect(() => {
-    const generateDailyEntries = async () => {
-      let calendarEntries = await invoke("generate_from_file")
-        .then((entries) => {
-          return entries;
-        })
-        .catch((error) => {
-          console.log(error);
-          return {};
-        });
-
-      setDailyEntries(calendarEntries as SetStateAction<{}>);
-    };
-
-    generateDailyEntries();
-  }, []);
+  const today = useTodayStore(state => state.today);
+  const entries = useDailyEntriesStore(state => state.dailyEntries);
 
   const changeCalendarView = () => {
     let newCalendarView = CalendarView.daily;
     if (calendarView === CalendarView.daily) {
-      newCalendarView = CalendarView.weekly; 
+      newCalendarView = CalendarView.weekly;
     } else if (calendarView === CalendarView.weekly) {
       newCalendarView = CalendarView.monthly;
     }
@@ -42,17 +22,24 @@ const LeftPanel = () => {
     console.log(calendarView);
   }
 
+  useEffect(() => {
+    entries.then(entries => setDailyEntries(entries[today]));
+  }, []);
+
   return (
     <div className="left-panel panel">
       <Today today={today} />
       <Accordion allowToggle>
-        {dailyEntries[today].map((entry) => {
-          return (
-            <React.Fragment key={entry.id}>
-              <Entry {...entry} />
-            </React.Fragment>
-          );
-        })}
+        {
+          dailyEntries.map(entry => {
+            return (
+              <React.Fragment key={entry.id}>
+                <Entry {...entry} />
+                <Box mt={2} />
+              </React.Fragment>
+            );
+          })
+        }
       </Accordion>
       <Spacer />
       <CalendarViewSelector title={calendarView} onClick={changeCalendarView} />

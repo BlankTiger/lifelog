@@ -1,13 +1,14 @@
 use crate::command_result::CommandResult;
-use chrono::{DateTime, Local, NaiveDate};
+use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs};
+use std::collections::HashMap;
+use tokio::fs;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PauseTime {
     elapsed_time: i64,
     actual_time: i64,
-    current_time: DateTime<Local>,
+    current_time: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -21,9 +22,11 @@ pub struct Entry {
 }
 
 #[tauri::command]
-pub fn generate_from_file() -> CommandResult<HashMap<NaiveDate, Vec<Entry>>> {
-    let file = fs::read_to_string("./entries.json").expect("Read a file");
-    let entries: HashMap<NaiveDate, Vec<Entry>> =
+pub async fn generate_from_file() -> CommandResult<HashMap<String, Vec<Entry>>> {
+    let file = fs::read_to_string("./entries.json")
+        .await
+        .expect("Can read file");
+    let entries: HashMap<String, Vec<Entry>> =
         serde_json::from_str(&file).expect("Converted to json");
     Ok(entries)
 }
