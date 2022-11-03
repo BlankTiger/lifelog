@@ -11,11 +11,11 @@ use std::path::Path;
 
 #[tokio::main]
 async fn main() {
-    let mut calendar = Calendar {
-        calendar_entries: Vec::new(),
-    };
-    let path = Path::new("./rozklad.ics");
-    calendar = calendar.from_icalendar(&path).await;
+    // let mut calendar = Calendar {
+    //     calendar_entries: Vec::new(),
+    // };
+    // let path = Path::new("./rozklad.ics");
+    // calendar = calendar.from_icalendar(&path).await;
     // let path = Path::new("./rozklad.json");
     // calendar.save_to_json(&path).await;
     tauri::Builder::default()

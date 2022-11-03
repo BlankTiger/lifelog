@@ -29,27 +29,27 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
   const checker = (arr: boolean[]) => arr.every(v => v === false);
 
   const getTime = () => {
-    if (currentEntryStart !== "") {
-      let startDate = new Date(currentEntryStart);
-      let isActive: boolean[] = [];
-      dailyEntries.forEach(entry => {
-        const start = new Date(entry["start"]).getTime();
-        const end = new Date(entry["end"]).getTime();
-        const now = new Date().getTime();
-        const shouldBeActive = start < now && now < end;
-        isActive.push(shouldBeActive);
-        shouldBeActive ? setCurrentEntry(entry["id"], entry["start"]) : () => { };
-      });
-      const shouldAnyBeActive = !checker(isActive);
-      shouldAnyBeActive ? () => { } : setCurrentEntry(0, "");
+    let startDate = new Date(currentEntryStart);
+    let isActive: boolean[] = [];
+    dailyEntries.forEach(entry => {
+      const start = new Date(entry["start"]).getTime();
+      const end = new Date(entry["end"]).getTime();
+      const now = new Date().getTime();
+      const shouldBeActive = start < now && now < end;
+      isActive.push(shouldBeActive);
+      shouldBeActive ? setCurrentEntry(entry["id"], entry["start"]) : () => { };
+    });
+    const shouldAnyBeActive = !checker(isActive);
+    shouldAnyBeActive ? () => { } : setCurrentEntry(0, "not_date");
 
-      setElapsedTime(Date.now() - startDate.getTime());
-      setSeconds(Math.floor(elapsedTime / 1000 % 60));
-      setMinutes(Math.floor(elapsedTime / 1000 / 60 % 60));
-      setHours(Math.floor(elapsedTime / 1000 / 60 / 60));
-      recalculateShownTime();
-    } else {
+    setElapsedTime(Date.now() - startDate.getTime());
+    setSeconds(Math.floor(elapsedTime / 1000 % 60));
+    setMinutes(Math.floor(elapsedTime / 1000 / 60 % 60));
+    setHours(Math.floor(elapsedTime / 1000 / 60 / 60));
+    if (currentEntryStart === "not_date") {
       setShownTime("00:00");
+    } else {
+      recalculateShownTime();
     }
   };
 
@@ -69,7 +69,7 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
           {timerTitle}
         </Heading>
         <Heading size="md">
-          {shownTime}
+          {shownTime === "NaN:NaN" ? "00:00" : shownTime}
         </Heading>
       </Flex>
     </>

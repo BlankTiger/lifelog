@@ -71,9 +71,6 @@ impl Calendar {
                 &end[19..21]
             );
 
-            // let day = format!("{}.{}.{}", &start[8..10], &start[5..7], &start[..4]);
-            // dbg!(&day);
-
             let start_date = DateTime::parse_from_rfc3339(&start).unwrap();
             let end_date = DateTime::parse_from_rfc3339(&end).unwrap();
             let status = match &lines[first + 10][7..] {
@@ -82,7 +79,6 @@ impl Calendar {
             };
 
             let start = DateTime::<Utc>::from(start_date);
-            dbg!(&start);
             let end = DateTime::<Utc>::from(end_date);
 
             let calendar_entry = CalendarEntry {

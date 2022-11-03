@@ -1,4 +1,4 @@
-import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading } from "@chakra-ui/react";
+import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading, Divider } from "@chakra-ui/react";
 import { CalendarEntry } from "./CalendarEntry";
 import { useEntryStore } from "../utils/GlobalState";
 import { useEffect, useState } from "react";
@@ -45,14 +45,23 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
         <div className="display-linebreak">
           {desc}
           <br />
-          <Heading size="sm">
-            {"\nLocation: "}
-          </ Heading>
-          {props.location}
-          <Heading size="sm">
-            {"\nCategory: "}
-          </ Heading>
-          {props.entry_type}
+          <Flex direction="column" justify="space-between" mt={3}>
+            <>
+              <Flex direction="row" justify="space-between">
+                <>
+                  <Text fontWeight="semibold">{"Location: "}</Text>
+                  {props.location}
+                </>
+              </Flex>
+              <Divider my={2} colorScheme="teal"/>
+              <Flex direction="row" justify="space-between">
+                <>
+                  <Text fontWeight="semibold"> {"Category: "}</Text>
+                  {props.entry_type}
+                </>
+              </Flex>
+            </>
+          </Flex>
         </div>
       </AccordionPanel>
     </AccordionItem >

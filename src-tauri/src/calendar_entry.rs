@@ -10,6 +10,5 @@ pub async fn generate_from_file() -> CommandResult<HashMap<String, Vec<CalendarE
         .expect("Can read file");
     let entries: HashMap<String, Vec<CalendarEntry>> =
         serde_json::from_str(&file).expect("Converted to json");
-    dbg!(&entries.get("03.11.2022").unwrap()[0].start);
     Ok(entries)
 }
