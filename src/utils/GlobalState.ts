@@ -1,42 +1,61 @@
 import create from "zustand";
 import { invoke } from "@tauri-apps/api";
 
-const generateDailyEntries = async (): Promise<EntriesObject[]> => {
-  return await invoke("generate_from_file")
+export type CalendarEntries = {
+  [key: string]: CalendarEntry[]
+};
+export type CalendarEntry = Record<string, Object>;
+
+const getCalendarEntries = async (path: string): Promise<CalendarEntries> => {
+  return await invoke("generate_from_file", { path: path })
     .then(entries => entries)
     .catch((error) => {
-      console.log(error);
+      console.error(error);
       return {};
-    }) as Promise<EntriesObject[]>;
+    }) as Promise<CalendarEntries>;
 };
 
-interface CurrentEntryState {
-  currentEntry: number;
-  currentEntryStart: string;
-  setCurrentEntry: (newEntry: number, newEntryStart: string) => void;
+
+const addCalendarEntry = (entries: Promise<CalendarEntries>, date: string, entry: CalendarEntry): Promise<CalendarEntries> => {
+  return entries.then((entries: CalendarEntries) => {
+    if (date in entries) {
+      entries[date].push(entry);
+    } else {
+      entries[date] = [entry];
+    }
+    return entries;
+  }) as Promise<CalendarEntries>;
+};
+
+const removeCalendarEntry = (entries: Promise<CalendarEntries>, id: number): Promise<CalendarEntries> => {
+  return entries.then((entries: CalendarEntries) => {
+    for (let date in entries) {
+      entries[date] = entries[date].filter((entry: CalendarEntry) => entry["id"] !== id);
+    }
+    return entries;
+  }) as Promise<CalendarEntries>;
 }
 
-export const useEntryStore = create<CurrentEntryState>()((set) => ({
+
+interface CalendarEntriesState {
+  calendarEntries: Promise<CalendarEntries>;
+  refreshEntries: () => void;
+  addCalendarEntry: (date: string, entry: CalendarEntry) => void;
+  removeCalendarEntry: (id: number) => void;
+  currentEntry: number;
+  currentEntryStart: string;
+  setCurrentEntry: (entryId: number, newEntryStart: string) => void;
+}
+
+export const useCalendarEntriesStore = create<CalendarEntriesState>()((set) => ({
+  calendarEntries: getCalendarEntries("./rozklad.json"),
+  refreshEntries: () => set(() => ({ calendarEntries: getCalendarEntries("./rozklad.json") })),
+  addCalendarEntry: (date, entry) => set((state) => ({ calendarEntries: addCalendarEntry(state.calendarEntries, date, entry) })),
+  removeCalendarEntry: (id) => set((state) => ({ calendarEntries: removeCalendarEntry(state.calendarEntries, id) })),
   currentEntry: 0,
   currentEntryStart: new Date().toLocaleString(),
   setCurrentEntry: (newEntry, newEntryStart) =>
     set(() => ({ currentEntry: newEntry, currentEntryStart: newEntryStart })),
-}));
-
-export type EntriesObject = {
-  [key: string]: Record<string, Object[]>;
-}
-
-interface DailyEntriesState {
-  dailyEntries: Promise<EntriesObject[]>;
-  setDailyEntries: (newEntries: Promise<EntriesObject[]>) => void;
-  refreshDailyEntries: () => void;
-}
-
-export const useDailyEntriesStore = create<DailyEntriesState>()((set) => ({
-  dailyEntries: generateDailyEntries(),
-  setDailyEntries: (newEntries) => set(() => ({ dailyEntries: newEntries })),
-  refreshDailyEntries: () => set(() => ({ dailyEntries: generateDailyEntries() })),
 }));
 
 interface TodayState {

@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, path::Path};
 use tokio::{fs, io::AsyncWriteExt};
@@ -37,7 +37,7 @@ impl Calendar {
     pub async fn from_icalendar(mut self, path: &Path) -> Self {
         let file = fs::read_to_string(path).await.expect("Should read file");
         let lines = file.split("\r\n").collect::<Vec<&str>>();
-        let timezone = lines[6];
+        // let timezone = lines[6];
         let mut begin_indexes = Vec::new();
         let mut end_indexes = Vec::new();
         for (i, line) in lines.iter().enumerate() {

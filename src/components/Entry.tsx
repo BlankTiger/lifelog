@@ -1,10 +1,10 @@
 import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading, Divider } from "@chakra-ui/react";
 import { CalendarEntry } from "./CalendarEntry";
-import { useEntryStore } from "../utils/GlobalState";
+import { useCalendarEntriesStore } from "../utils/GlobalState";
 import { useEffect, useState } from "react";
 
 export const Entry = (props: CalendarEntry): JSX.Element => {
-  const currentEntry = useEntryStore((state) => state.currentEntry);
+  const currentEntry = useCalendarEntriesStore((state) => state.currentEntry);
   const [active, setActive] = useState(false);
   const desc = props.description.replace("\\n", "\n");
 

@@ -1,6 +1,6 @@
 import { Flex, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useDailyEntriesStore, useEntryStore, useTodayStore } from "../utils/GlobalState";
+import { useCalendarEntriesStore, useShouldRefreshStore, useTodayStore } from "../utils/GlobalState";
 
 export type TimerProps = {
   timerTitle: string,
@@ -13,9 +13,9 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
   const [seconds, setSeconds] = useState(0);
   const [shownTime, setShownTime] = useState("00:00");
   const [dailyEntries, setDailyEntries] = useState([]);
-  const [currentEntryStart, setCurrentEntry] = useEntryStore(state =>
-    [state.currentEntryStart, state.setCurrentEntry]);
-  const entries: any = useDailyEntriesStore(state => state.dailyEntries);
+  const [entries, currentEntryStart, setCurrentEntry] = useCalendarEntriesStore(state =>
+    [state.calendarEntries, state.currentEntryStart, state.setCurrentEntry]);
+  const shouldRefresh = useShouldRefreshStore(state => state.shouldRefresh);
   const todayShowable = useTodayStore(state => state.todayShowable);
 
   const recalculateShownTime = () => {
@@ -58,13 +58,10 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     return () => clearInterval(interval);
   });
 
-  type EntriesObject = {
-    [key: string]: []
-  }
 
   useEffect(() => {
-    entries.then((entries: EntriesObject) => setDailyEntries(entries[todayShowable]));
-  }, [todayShowable]);
+    entries.then((entries: any) => setDailyEntries(entries[todayShowable]));
+  }, [todayShowable, shouldRefresh]);
 
   return (
     <>

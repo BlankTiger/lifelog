@@ -4,7 +4,7 @@ import { Entry } from "./Entry";
 import { Today } from "./Today";
 import { CalendarViewSelector, CalendarView } from "./CalendarViewSelector";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
-import { useDailyEntriesStore, useShouldRefreshStore, useTodayStore } from "../utils/GlobalState";
+import { useCalendarEntriesStore, useShouldRefreshStore, useTodayStore } from "../utils/GlobalState";
 import { CalendarEntry } from "./CalendarEntry";
 import { RefreshButton } from "./RefreshButton";
 
@@ -13,8 +13,8 @@ const LeftPanel = () => {
   const [calendarView, setCalendarView] = useState(CalendarView.daily);
   const [today, todayShowable, setToday] = useTodayStore(state =>
     [state.today, state.todayShowable, state.setToday]);
-  const entries: any = useDailyEntriesStore(state => state.dailyEntries);
-  const refreshDailyEntries = useDailyEntriesStore(state => state.refreshDailyEntries);
+  const entries = useCalendarEntriesStore(state => state.calendarEntries);
+  const refreshEntries = useCalendarEntriesStore(state => state.refreshEntries);
   const [shouldRefresh, setShouldRefresh] = useShouldRefreshStore(state =>
     [state.shouldRefresh, state.setShouldRefresh]);
 
@@ -44,9 +44,9 @@ const LeftPanel = () => {
     console.log(calendarView);
   }
 
-  const refreshEntries = () => {
+  const refreshCalendarEntries = () => {
     setShouldRefresh();
-    refreshDailyEntries();
+    refreshEntries();
   }
 
   useEffect(() => {
@@ -83,7 +83,7 @@ const LeftPanel = () => {
         <Box flex={0.1} />
         <CalendarViewSelector flex={0.5} title={calendarView} onClick={changeCalendarView} />
         <Box flex={0.1} />
-        <RefreshButton flex={0.5} onClick={refreshEntries} />
+        <RefreshButton flex={0.5} onClick={refreshCalendarEntries} />
         <Box flex={0.1} />
       </Flex>
     </div>

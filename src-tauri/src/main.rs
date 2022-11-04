@@ -19,7 +19,7 @@ async fn main() {
     // let path = Path::new("./rozklad.json");
     // calendar.save_to_json(&path).await;
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![generate_from_file])
+        .invoke_handler(tauri::generate_handler![generate_from_file, ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
