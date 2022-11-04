@@ -1,13 +1,13 @@
 import create from "zustand";
 import { invoke } from "@tauri-apps/api";
 
-const generateDailyEntries = async () => {
+const generateDailyEntries = async (): Promise<EntriesObject[]> => {
   return await invoke("generate_from_file")
     .then(entries => entries)
     .catch((error) => {
       console.log(error);
       return {};
-    })
+    }) as Promise<EntriesObject[]>;
 };
 
 interface CurrentEntryState {
@@ -23,14 +23,20 @@ export const useEntryStore = create<CurrentEntryState>()((set) => ({
     set(() => ({ currentEntry: newEntry, currentEntryStart: newEntryStart })),
 }));
 
+export type EntriesObject = {
+  [key: string]: Record<string, Object[]>;
+}
+
 interface DailyEntriesState {
-  dailyEntries: Object;
-  setDailyEntries: (newEntries: Object) => void;
+  dailyEntries: Promise<EntriesObject[]>;
+  setDailyEntries: (newEntries: Promise<EntriesObject[]>) => void;
+  refreshDailyEntries: () => void;
 }
 
 export const useDailyEntriesStore = create<DailyEntriesState>()((set) => ({
   dailyEntries: generateDailyEntries(),
   setDailyEntries: (newEntries) => set(() => ({ dailyEntries: newEntries })),
+  refreshDailyEntries: () => set(() => ({ dailyEntries: generateDailyEntries() })),
 }));
 
 interface TodayState {
@@ -71,4 +77,14 @@ export const useElapsedTimeStore = create<ElapsedTimeState>()((set) => ({
   clearResumeTimes: () => set(() => ({ resumeTimes: [] })),
   pushPauseTime: (pauseTime) => set((state) => ({ pauseTimes: [...state.pauseTimes, pauseTime] })),
   clearPauseTimes: () => set(() => ({ pauseTimes: [] })),
+}));
+
+interface RefreshEntriesState {
+  shouldRefresh: boolean;
+  setShouldRefresh: () => void;
+}
+
+export const useShouldRefreshStore = create<RefreshEntriesState>()((set) => ({
+  shouldRefresh: false,
+  setShouldRefresh: () => set((state) => ({ shouldRefresh: !state.shouldRefresh })),
 }));

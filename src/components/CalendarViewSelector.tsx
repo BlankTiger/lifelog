@@ -1,4 +1,4 @@
-import { Button, Flex } from "@chakra-ui/react"
+import { Button } from "@chakra-ui/react"
 import { MouseEventHandler } from "react"
 
 export enum CalendarView {
@@ -9,13 +9,12 @@ export enum CalendarView {
 
 interface Props {
   title: CalendarView;
+  flex: number;
   onClick: MouseEventHandler;
 }
 
-export const CalendarViewSelector = ({ title, onClick }: Props) => {
+export const CalendarViewSelector = ({ flex, title, onClick }: Props) => {
   return (
-    <Flex direction="row" justify="center">
-      <Button onClick={onClick}>{title}</ Button>
-    </ Flex>
+    <Button flex={flex} onClick={onClick}>{title}</ Button>
   );
 }

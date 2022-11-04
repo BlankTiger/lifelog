@@ -4,8 +4,9 @@ import { Entry } from "./Entry";
 import { Today } from "./Today";
 import { CalendarViewSelector, CalendarView } from "./CalendarViewSelector";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
-import { useDailyEntriesStore, useTodayStore } from "../utils/GlobalState";
+import { useDailyEntriesStore, useShouldRefreshStore, useTodayStore } from "../utils/GlobalState";
 import { CalendarEntry } from "./CalendarEntry";
+import { RefreshButton } from "./RefreshButton";
 
 const LeftPanel = () => {
   const [dailyEntries, setDailyEntries] = useState<CalendarEntry[]>([]);
@@ -13,6 +14,9 @@ const LeftPanel = () => {
   const [today, todayShowable, setToday] = useTodayStore(state =>
     [state.today, state.todayShowable, state.setToday]);
   const entries: any = useDailyEntriesStore(state => state.dailyEntries);
+  const refreshDailyEntries = useDailyEntriesStore(state => state.refreshDailyEntries);
+  const [shouldRefresh, setShouldRefresh] = useShouldRefreshStore(state =>
+    [state.shouldRefresh, state.setShouldRefresh]);
 
 
   const setNextDay = () => {
@@ -40,13 +44,14 @@ const LeftPanel = () => {
     console.log(calendarView);
   }
 
-  type EntriesObject = {
-    [key: string]: []
+  const refreshEntries = () => {
+    setShouldRefresh();
+    refreshDailyEntries();
   }
 
   useEffect(() => {
-    entries.then((entries: EntriesObject) => setDailyEntries(entries[todayShowable]));
-  }, [today]);
+    entries.then((entries: any) => setDailyEntries(entries[todayShowable]));
+  }, [today, shouldRefresh]);
 
   return (
     <div className="left-panel panel">
@@ -74,7 +79,13 @@ const LeftPanel = () => {
         }
       </Accordion>
       <Spacer />
-      <CalendarViewSelector title={calendarView} onClick={changeCalendarView} />
+      <Flex direction="row" align="center" justify="space-evenly">
+        <Box flex={0.1} />
+        <CalendarViewSelector flex={0.5} title={calendarView} onClick={changeCalendarView} />
+        <Box flex={0.1} />
+        <RefreshButton flex={0.5} onClick={refreshEntries} />
+        <Box flex={0.1} />
+      </Flex>
     </div>
   );
 }
