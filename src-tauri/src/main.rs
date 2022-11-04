@@ -6,6 +6,8 @@
 use lifelog::calendar::Calendar;
 use lifelog::calendar_entry::__cmd__generate_from_file;
 use lifelog::calendar_entry::generate_from_file;
+use lifelog::calendar_entry::__cmd__get_calendar_path;
+use lifelog::calendar_entry::get_calendar_path;
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -19,7 +21,7 @@ async fn main() {
     // let path = Path::new("./rozklad.json");
     // calendar.save_to_json(&path).await;
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![generate_from_file, ])
+        .invoke_handler(tauri::generate_handler![generate_from_file, get_calendar_path])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

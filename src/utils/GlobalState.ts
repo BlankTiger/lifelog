@@ -5,6 +5,7 @@ export type CalendarEntries = {
   [key: string]: CalendarEntry[]
 };
 export type CalendarEntry = Record<string, Object>;
+export const calendarPath: string = await invoke("get_calendar_path");
 
 const getCalendarEntries = async (path: string): Promise<CalendarEntries> => {
   return await invoke("generate_from_file", { path: path })
@@ -48,8 +49,8 @@ interface CalendarEntriesState {
 }
 
 export const useCalendarEntriesStore = create<CalendarEntriesState>()((set) => ({
-  calendarEntries: getCalendarEntries("./rozklad.json"),
-  refreshEntries: () => set(() => ({ calendarEntries: getCalendarEntries("./rozklad.json") })),
+  calendarEntries: getCalendarEntries(calendarPath),
+  refreshEntries: () => set(() => ({ calendarEntries: getCalendarEntries(calendarPath) })),
   addCalendarEntry: (date, entry) => set((state) => ({ calendarEntries: addCalendarEntry(state.calendarEntries, date, entry) })),
   removeCalendarEntry: (id) => set((state) => ({ calendarEntries: removeCalendarEntry(state.calendarEntries, id) })),
   currentEntry: 0,

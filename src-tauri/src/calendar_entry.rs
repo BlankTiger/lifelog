@@ -21,6 +21,11 @@ pub async fn generate_from_file(path: &Path) -> CommandResult<CalendarEntries> {
 }
 
 #[tauri::command]
+pub async fn get_calendar_path() -> CommandResult<String> {
+    Ok(home::home_dir().unwrap().display().to_string() + "/.config/lifelog/calendar.json")
+}
+
+#[tauri::command]
 pub async fn add_entry_for_date(
     path: &Path,
     date: String,
