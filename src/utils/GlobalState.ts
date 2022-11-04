@@ -16,25 +16,22 @@ const getCalendarEntries = async (path: string): Promise<CalendarEntries> => {
     }) as Promise<CalendarEntries>;
 };
 
-
-const addCalendarEntry = (entries: Promise<CalendarEntries>, date: string, entry: CalendarEntry): Promise<CalendarEntries> => {
-  return entries.then((entries: CalendarEntries) => {
-    if (date in entries) {
-      entries[date].push(entry);
-    } else {
-      entries[date] = [entry];
-    }
-    return entries;
-  }) as Promise<CalendarEntries>;
+const addCalendarEntry = async (date: string, entry: CalendarEntry): Promise<CalendarEntries> => {
+  return await invoke("add_entry_for_date", { date: date, entry: entry })
+    .then(entries => entries)
+    .catch((error) => {
+      console.error(error);
+      return {};
+    }) as Promise<CalendarEntries>;
 };
 
-const removeCalendarEntry = (entries: Promise<CalendarEntries>, id: number): Promise<CalendarEntries> => {
-  return entries.then((entries: CalendarEntries) => {
-    for (let date in entries) {
-      entries[date] = entries[date].filter((entry: CalendarEntry) => entry["id"] !== id);
-    }
-    return entries;
-  }) as Promise<CalendarEntries>;
+const removeCalendarEntry = async (id: number): Promise<CalendarEntries> => {
+  return await invoke("remove_entry_by_id", { id: id })
+    .then(entries => entries)
+    .catch((error) => {
+      console.error(error);
+      return {};
+    }) as Promise<CalendarEntries>;
 }
 
 
@@ -51,8 +48,8 @@ interface CalendarEntriesState {
 export const useCalendarEntriesStore = create<CalendarEntriesState>()((set) => ({
   calendarEntries: getCalendarEntries(calendarPath),
   refreshEntries: () => set(() => ({ calendarEntries: getCalendarEntries(calendarPath) })),
-  addCalendarEntry: (date, entry) => set((state) => ({ calendarEntries: addCalendarEntry(state.calendarEntries, date, entry) })),
-  removeCalendarEntry: (id) => set((state) => ({ calendarEntries: removeCalendarEntry(state.calendarEntries, id) })),
+  addCalendarEntry: (date, entry) => set(() => ({ calendarEntries: addCalendarEntry(date, entry) })),
+  removeCalendarEntry: (id) => set(() => ({ calendarEntries: removeCalendarEntry(id) })),
   currentEntry: 0,
   currentEntryStart: new Date().toLocaleString(),
   setCurrentEntry: (newEntry, newEntryStart) =>

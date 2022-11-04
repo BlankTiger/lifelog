@@ -64,6 +64,7 @@ const LeftPanel = () => {
           <ArrowRightIcon />
         </Button>
       </Flex>
+      <Flex direction="column" overflow="auto" height="max">
       <Accordion allowToggle mt={3}>
         {dailyEntries !== undefined ?
           dailyEntries.map(entry => {
@@ -78,6 +79,7 @@ const LeftPanel = () => {
           ""
         }
       </Accordion>
+      </Flex>
       <Spacer />
       <Flex direction="row" align="center" justify="space-evenly">
         <Box flex={0.1} />
