@@ -7,7 +7,7 @@ import { Description } from "./Description";
 export const Entry = (props: CalendarEntry): JSX.Element => {
   const currentEntry = useCalendarEntriesStore((state) => state.currentEntry);
   const [active, setActive] = useState(false);
-  const desc = props.description.replace("\\n", "\n");
+  const desc = props.description;
 
   const start = new Date(props.start);
   const startHours = start.getHours() >= 10 ? start.getHours() : "0" + start.getHours();
