@@ -2,6 +2,7 @@ import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Bo
 import { CalendarEntry } from "./CalendarEntry";
 import { useCalendarEntriesStore } from "../utils/GlobalState";
 import { useEffect, useState } from "react";
+import { Description } from "./Description";
 
 export const Entry = (props: CalendarEntry): JSX.Element => {
   const currentEntry = useCalendarEntriesStore((state) => state.currentEntry);
@@ -47,7 +48,7 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
       </Heading>
       <AccordionPanel>
         <div className="display-linebreak">
-          {desc}
+          <Description description={desc} />
           <br />
           <Flex direction="column" justify="space-between" mt={5}>
             <>

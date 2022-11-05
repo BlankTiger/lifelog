@@ -62,7 +62,7 @@ const LeftPanel = () => {
       start: new Date(),
       end: new Date(end),
       summary: "new item",
-      description: "test",
+      description: "test\\n- [ ] do this shit man",
       location: "Home",
       status: "Confirmed",
       entry_type: "Work",
