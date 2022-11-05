@@ -1,3 +1,13 @@
+@keyframes background-pan {
+  from {
+    background-position: 0% center;
+  }
+
+  to {
+    background-position: -200% center;
+  }
+}
+
 .container {
   display: flex;
   flex-direction: row;
@@ -35,4 +45,9 @@
 
 .display-linebreak {
   white-space: pre-line;
+}
+
+.floating-gradient {
+  animation: background-pan 4s linear infinite;
+  background-size: 200%;
 }

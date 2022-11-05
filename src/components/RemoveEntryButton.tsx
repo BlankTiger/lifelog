@@ -1,3 +1,4 @@
+import { MinusIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/react";
 import { MouseEventHandler } from "react";
 
@@ -6,5 +7,5 @@ interface Props {
 }
 
 export const RemoveEntryButton = ({onClick}: Props) => {
-  return <Button onClick={onClick}>{"Remove entry"}</Button>;
+  return <Button onClick={onClick}><MinusIcon /></Button>;
 }

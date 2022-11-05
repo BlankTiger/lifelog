@@ -1,4 +1,4 @@
-import { Accordion, Box, Button, Flex, Spacer } from "@chakra-ui/react";
+import { Accordion, Box, Button, Divider, Flex, Spacer } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Entry } from "./Entry";
 import { Today } from "./Today";
@@ -7,6 +7,8 @@ import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import { useCalendarEntriesStore, useShouldRefreshStore, useTodayStore } from "../utils/GlobalState";
 import { CalendarEntry } from "./CalendarEntry";
 import { RefreshButton } from "./RefreshButton";
+import { AddEntryButton } from "./AddEntryButton";
+import { RemoveEntryButton } from "./RemoveEntryButton";
 
 const LeftPanel = () => {
   const [dailyEntries, setDailyEntries] = useState<CalendarEntry[]>([]);
@@ -17,6 +19,9 @@ const LeftPanel = () => {
   const refreshEntries = useCalendarEntriesStore(state => state.refreshEntries);
   const [shouldRefresh, setShouldRefresh] = useShouldRefreshStore(state =>
     [state.shouldRefresh, state.setShouldRefresh]);
+  const [addCalendarEntry, removeCalendarEntry] = useCalendarEntriesStore(state =>
+    [state.addCalendarEntry, state.removeCalendarEntry]
+  );
 
 
   const setNextDay = () => {
@@ -47,6 +52,27 @@ const LeftPanel = () => {
   const refreshCalendarEntries = () => {
     setShouldRefresh();
     refreshEntries();
+  }
+
+  const addEntry = () => {
+    setShouldRefresh();
+    let end = new Date().setHours(23, 0, 0);
+    let entry = {
+      id: 111111,
+      start: new Date(),
+      end: new Date(end),
+      summary: "new item",
+      description: "test",
+      location: "Home",
+      status: "Confirmed",
+      entry_type: "Work",
+    };
+    addCalendarEntry(todayShowable, entry);
+  };
+
+  const removeEntry = () => {
+    setShouldRefresh();
+    removeCalendarEntry(111111);
   }
 
   useEffect(() => {
@@ -80,7 +106,12 @@ const LeftPanel = () => {
         }
       </Accordion>
       </Flex>
+      <Flex direction="row" mt={4} justify="center" align="center" gap="3vw">
+        <AddEntryButton onClick={addEntry} />
+        <RemoveEntryButton onClick={removeEntry} />
+      </Flex>
       <Spacer />
+      <Divider />
       <Flex direction="row" align="center" justify="space-evenly">
         <Box flex={0.1} />
         <CalendarViewSelector flex={0.5} title={calendarView} onClick={changeCalendarView} />
