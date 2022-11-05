@@ -9,6 +9,7 @@ import { CalendarEntry } from "./CalendarEntry";
 import { RefreshButton } from "./RefreshButton";
 import { AddEntryButton } from "./AddEntryButton";
 import { RemoveEntryButton } from "./RemoveEntryButton";
+import { WebviewWindow, appWindow } from "@tauri-apps/api/window";
 
 const LeftPanel = () => {
   const [dailyEntries, setDailyEntries] = useState<CalendarEntry[]>([]);
@@ -19,8 +20,8 @@ const LeftPanel = () => {
   const refreshEntries = useCalendarEntriesStore(state => state.refreshEntries);
   const [shouldRefresh, setShouldRefresh] = useShouldRefreshStore(state =>
     [state.shouldRefresh, state.setShouldRefresh]);
-  const [addCalendarEntry, removeCalendarEntry] = useCalendarEntriesStore(state =>
-    [state.addCalendarEntry, state.removeCalendarEntry]
+  const [addCalendarEntry, removeCalendarEntry, currentEntry] = useCalendarEntriesStore(state =>
+    [state.addCalendarEntry, state.removeCalendarEntry, state.currentEntry]
   );
 
 
@@ -54,25 +55,13 @@ const LeftPanel = () => {
     refreshEntries();
   }
 
-  const addEntry = () => {
-    setShouldRefresh();
-    let end = new Date().setHours(23, 0, 0);
-    let entry = {
-      id: 111111,
-      start: new Date(),
-      end: new Date(end),
-      summary: "new item",
-      description: "Todo for new item:\\n- [ ] todo number 1\\n- [ ] tudu namber 2\\n- [ ] tudu namber 2\\n- [ ] tudu namber 2",
-      location: "Home",
-      status: "Confirmed",
-      entry_type: "Work",
-    };
-    addCalendarEntry(todayShowable, entry);
+  const addEntry = async () => {
+    new WebviewWindow('add', { title: "Add entry", url: "add.html", height: 800, width: 600 });
   };
 
   const removeEntry = () => {
     setShouldRefresh();
-    removeCalendarEntry(111111);
+    removeCalendarEntry(currentEntry);
   }
 
   useEffect(() => {
@@ -91,20 +80,20 @@ const LeftPanel = () => {
         </Button>
       </Flex>
       <Flex direction="column" overflow="auto" height="max">
-      <Accordion allowToggle mt={3}>
-        {dailyEntries !== undefined ?
-          dailyEntries.map(entry => {
-            return (
-              <React.Fragment>
-                <Entry {...entry} />
-                <Box mt={2} />
-              </React.Fragment>
-            );
-          })
-          :
-          ""
-        }
-      </Accordion>
+        <Accordion allowToggle mt={3}>
+          {dailyEntries !== undefined ?
+            dailyEntries.map(entry => {
+              return (
+                <React.Fragment>
+                  <Entry {...entry} />
+                  <Box mt={2} />
+                </React.Fragment>
+              );
+            })
+            :
+            ""
+          }
+        </Accordion>
       </Flex>
       <Flex direction="row" mt={4} justify="center" align="center" gap="3vw">
         <AddEntryButton onClick={addEntry} />

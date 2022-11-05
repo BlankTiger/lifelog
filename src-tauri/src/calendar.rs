@@ -7,6 +7,9 @@ use tokio::{fs, io::AsyncWriteExt};
 pub enum EntryStatus {
     Confirmed,
     Rejected,
+    Unknown,
+    Waiting,
+    Accepted,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
