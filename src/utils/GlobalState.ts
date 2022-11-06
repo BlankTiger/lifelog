@@ -25,8 +25,9 @@ const addCalendarEntry = async (date: string, entry: CalendarEntry): Promise<Cal
     }) as Promise<CalendarEntries>;
 };
 
-const removeCalendarEntry = async (id: number): Promise<CalendarEntries> => {
-  return await invoke("remove_entry_by_id", { id: id })
+const removeCalendarEntries = async (ids: number[], clearEntriesForRemoval: any): Promise<CalendarEntries> => {
+  clearEntriesForRemoval();
+  return await invoke("remove_entry_by_ids", { ids: ids })
     .then(entries => entries)
     .catch((error) => {
       console.error(error);
@@ -39,7 +40,11 @@ interface CalendarEntriesState {
   calendarEntries: Promise<CalendarEntries>;
   refreshEntries: () => void;
   addCalendarEntry: (date: string, entry: CalendarEntry) => void;
-  removeCalendarEntry: (id: number) => void;
+  entriesForRemoval: number[];
+  clearEntriesForRemoval: () => void;
+  pushEntryForRemoval: (id: number) => void;
+  popEntryForRemoval: (id: number) => void;
+  removeCalendarEntries: () => void;
   currentEntry: number;
   currentEntryStart: string;
   setCurrentEntry: (entryId: number, newEntryStart: string) => void;
@@ -49,7 +54,17 @@ export const useCalendarEntriesStore = create<CalendarEntriesState>()((set) => (
   calendarEntries: getCalendarEntries(calendarPath),
   refreshEntries: () => set(() => ({ calendarEntries: getCalendarEntries(calendarPath) })),
   addCalendarEntry: (date, entry) => set(() => ({ calendarEntries: addCalendarEntry(date, entry) })),
-  removeCalendarEntry: (id) => set(() => ({ calendarEntries: removeCalendarEntry(id) })),
+  entriesForRemoval: [],
+  clearEntriesForRemoval: () => set(() => ({ entriesForRemoval: [] })),
+  pushEntryForRemoval: (id) => set((state) => ({ entriesForRemoval: [...state.entriesForRemoval, id] })),
+  popEntryForRemoval: (id) => set((state) => ({
+    entriesForRemoval:
+      [...state.entriesForRemoval.filter(entryId => entryId !== id)]
+  })),
+  removeCalendarEntries: () => set((state) => ({
+    calendarEntries:
+      removeCalendarEntries(state.entriesForRemoval, state.clearEntriesForRemoval)
+  })),
   currentEntry: 0,
   currentEntryStart: new Date().toLocaleString(),
   setCurrentEntry: (newEntry, newEntryStart) =>

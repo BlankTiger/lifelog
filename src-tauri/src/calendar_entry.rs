@@ -46,15 +46,11 @@ pub async fn add_entry_for_date(
 }
 
 #[tauri::command]
-pub async fn remove_entry_by_id(id: i64) -> CommandResult<CalendarEntries> {
+pub async fn remove_entry_by_ids(ids: Vec<i64>) -> CommandResult<CalendarEntries> {
     let calendar_path = get_calendar_path_buf().unwrap();
     let mut entries = generate_from_file(&calendar_path).await?;
     entries = entries.into_iter().map(|(day, mut day_entries)| {
-        for (id_in_list, entry) in day_entries.clone().iter().enumerate() {
-            if entry.id == id {
-                day_entries.remove(id_in_list);
-            }
-        }
+        day_entries.retain(|entry| !ids.contains(&entry.id));
         (day, day_entries)
     }).collect::<CalendarEntries>();
     save_to_file(&calendar_path, &entries).await?;

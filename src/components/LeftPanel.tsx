@@ -20,9 +20,7 @@ const LeftPanel = () => {
   const refreshEntries = useCalendarEntriesStore(state => state.refreshEntries);
   const [shouldRefresh, setShouldRefresh] = useShouldRefreshStore(state =>
     [state.shouldRefresh, state.setShouldRefresh]);
-  const [addCalendarEntry, removeCalendarEntry, currentEntry] = useCalendarEntriesStore(state =>
-    [state.addCalendarEntry, state.removeCalendarEntry, state.currentEntry]
-  );
+  const removeCalendarEntries = useCalendarEntriesStore(state => state.removeCalendarEntries);
 
 
   const setNextDay = () => {
@@ -59,9 +57,9 @@ const LeftPanel = () => {
     new WebviewWindow('add', { title: "Add entry", url: "add.html", height: 800, width: 600 });
   };
 
-  const removeEntry = () => {
+  const removeEntries = () => {
     setShouldRefresh();
-    removeCalendarEntry(currentEntry);
+    removeCalendarEntries();
   }
 
   useEffect(() => {
@@ -97,7 +95,7 @@ const LeftPanel = () => {
       </Flex>
       <Flex direction="row" mt={4} justify="center" align="center" gap="3vw">
         <AddEntryButton onClick={addEntry} />
-        <RemoveEntryButton onClick={removeEntry} />
+        <RemoveEntryButton onClick={removeEntries} />
       </Flex>
       <Spacer />
       <Divider />

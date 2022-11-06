@@ -1,11 +1,13 @@
-import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading, Divider } from "@chakra-ui/react";
+import { AccordionButton, Text, AccordionIcon, AccordionItem, AccordionPanel, Box, Flex, Heading, Divider, Checkbox } from "@chakra-ui/react";
+import { MinusIcon } from "@chakra-ui/icons";
 import { CalendarEntry } from "./CalendarEntry";
 import { useCalendarEntriesStore } from "../utils/GlobalState";
 import { useEffect, useState } from "react";
 import { Description } from "./Description";
 
 export const Entry = (props: CalendarEntry): JSX.Element => {
-  const currentEntry = useCalendarEntriesStore((state) => state.currentEntry);
+  const [currentEntry, pushEntryForRemoval, popEntryForRemoval] = useCalendarEntriesStore(state =>
+    [state.currentEntry, state.pushEntryForRemoval, state.popEntryForRemoval, state.entriesForRemoval]);
   const [active, setActive] = useState(false);
   const desc = props.description;
 
@@ -20,13 +22,16 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
   const startTime = startHours + ":" + startMinutes;
   const endTime = endHours + ":" + endMinutes;
 
+  const onCheckboxChanged = (ev: any) => {
+    ev.target.checked ? pushEntryForRemoval(props.id) : popEntryForRemoval(props.id);
+  }
+
   useEffect(() => {
     setActive(props.id === currentEntry);
   }, [currentEntry]);
 
-
   return (
-    <AccordionItem 
+    <AccordionItem
       key={props.id}
       border="1px"
       bgGradient={active ? "linear(30deg, #43cea2, #185a9d)" : ""}
@@ -35,6 +40,13 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
         <AccordionButton fontWeight="bold">
           <Box flex="1" textAlign="left">
             <Flex direction="row" justify="space-between" align="center">
+              <Checkbox onChange={onCheckboxChanged}
+                mb={1}
+                mr={1.5}
+                size="md"
+                colorScheme="red"
+                icon={<MinusIcon />}
+              />
               <Box flex="2" textAlign="left">
                 {props.summary}
               </Box>
@@ -58,7 +70,7 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
                   {props.location}
                 </>
               </Flex>
-              <Divider my={2} colorScheme="teal"/>
+              <Divider my={2} colorScheme="teal" />
               <Flex direction="row" justify="space-between">
                 <>
                   <Text fontWeight="semibold"> {"Category: "}</Text>

@@ -6,11 +6,11 @@
 use lifelog::calendar_entry::__cmd__add_entry_for_date;
 use lifelog::calendar_entry::__cmd__generate_from_file;
 use lifelog::calendar_entry::__cmd__get_calendar_path;
-use lifelog::calendar_entry::__cmd__remove_entry_by_id;
+use lifelog::calendar_entry::__cmd__remove_entry_by_ids;
 use lifelog::calendar_entry::add_entry_for_date;
 use lifelog::calendar_entry::generate_from_file;
 use lifelog::calendar_entry::get_calendar_path;
-use lifelog::calendar_entry::remove_entry_by_id;
+use lifelog::calendar_entry::remove_entry_by_ids;
 
 #[tokio::main]
 async fn main() {
@@ -26,7 +26,7 @@ async fn main() {
             generate_from_file,
             get_calendar_path,
             add_entry_for_date,
-            remove_entry_by_id
+            remove_entry_by_ids
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
