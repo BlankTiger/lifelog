@@ -37,7 +37,9 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "/home/blanktiger/personal_projects/lifelog/add.html"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {

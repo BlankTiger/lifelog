@@ -105,12 +105,40 @@ export const useElapsedTimeStore = create<ElapsedTimeState>()((set) => ({
   setElapsedTime: (newElapsedTime) => set(() => ({ elapsedTime: newElapsedTime })),
 }));
 
+const calcActualElapsedTime = (
+  actualElapsedTime: number,
+  resumeTimes: Date[],
+  pauseTimes: Date[],
+  isRunning: boolean
+): number => {
+  if (isRunning) {
+    let actualElapsedTime = 0;
+    /* ([5], []) */
+    /* ([5], [10]) */
+    /* ([5, 15], [10]) */
+    /* ([5, 15], [10, 20]) */
+    /* ([5, 15, 25], [10, 20]) */
+    if (pauseTimes.length === 0) {
+      return (Date.now() - new Date(resumeTimes[0]).getTime()) / 1000
+    }
+    for (let i = 0; i < pauseTimes.length; i++) {
+      actualElapsedTime += (pauseTimes[i].getTime() - resumeTimes[i].getTime()) / 1000;
+    }
+    if (resumeTimes.length > pauseTimes.length) {
+      actualElapsedTime += (Date.now() - resumeTimes[resumeTimes.length - 1].getTime()) / 1000;
+    }
+    return actualElapsedTime;
+  }
+  return actualElapsedTime;
+}
+
 interface ActualElapsedTimeState {
   actualElapsedTime: number;
   resumeTimes: Date[];
   pauseTimes: Date[];
   isRunning: boolean;
   setActualElapsedTime: (newActualElapsedTime: number) => void;
+  calculateActualElapsedTime: () => void;
   pushResumeTime: (resumeTime: Date) => void;
   clearResumeTimes: () => void;
   pushPauseTime: (pauseTime: Date) => void;
@@ -124,6 +152,14 @@ export const useActualElapsedTimeStore = create<ActualElapsedTimeState>()((set) 
   pauseTimes: [],
   isRunning: false,
   setActualElapsedTime: (newActualElapsedTime) => set(() => ({ actualElapsedTime: newActualElapsedTime })),
+  calculateActualElapsedTime: () => set((state) => ({
+    actualElapsedTime: calcActualElapsedTime(
+      state.actualElapsedTime,
+      state.resumeTimes,
+      state.pauseTimes,
+      state.isRunning
+    )
+  })),
   pushResumeTime: (resumeTime) => set((state) => ({ resumeTimes: [...state.resumeTimes, resumeTime] })),
   clearResumeTimes: () => set(() => ({ resumeTimes: [] })),
   pushPauseTime: (pauseTime) => set((state) => ({ pauseTimes: [...state.pauseTimes, pauseTime] })),

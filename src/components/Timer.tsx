@@ -22,6 +22,7 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     [state.elapsedTime, state.setElapsedTime]);
   const [actualElapsedTime,
     setActualElapsedTime,
+    calculateActualElapsedTime,
     isRunning,
     setIsRunning,
     resumeTimes,
@@ -31,6 +32,7 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     useActualElapsedTimeStore(state =>
       [state.actualElapsedTime,
       state.setActualElapsedTime,
+      state.calculateActualElapsedTime,
       state.isRunning,
       state.setIsRunning,
       state.resumeTimes,
@@ -64,7 +66,7 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
 
     setShouldSaveStats((new Date(currentEntryEnd).getTime() - Date.now()) / 1000 < 2);
     setElapsedTime(Date.now() - startDate.getTime());
-    setActualElapsedTime(isRunning ? actualElapsedTime + 1 : actualElapsedTime);
+    calculateActualElapsedTime();
     setSeconds(Math.floor(elapsedTime / 1000 % 60));
     setMinutes(Math.floor(elapsedTime / 1000 / 60 % 60));
     setHours(Math.floor(elapsedTime / 1000 / 60 / 60));
@@ -86,6 +88,9 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   const saveStatistics = async () => {
+    if (currentEntry === 0) {
+      return;
+    }
     const statistics: Statistics = {
       id: currentEntry,
       total_duration: Math.floor(elapsedTime / 1000) + 2,
@@ -96,11 +101,13 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     };
     await invoke("add_stats_for_date", { date: todayShowable, stats: statistics });
     const resetActualTimer = async () => {
-      await sleep(2000);
-      setIsRunning();
-      setActualElapsedTime(0);
-      clearResumeTimes();
-      clearPauseTimes();
+      if (isRunning) {
+        await sleep(2000);
+        setIsRunning();
+        setActualElapsedTime(0);
+        clearResumeTimes();
+        clearPauseTimes();
+      }
     };
     resetActualTimer();
   };
