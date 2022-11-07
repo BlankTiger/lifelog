@@ -5,9 +5,9 @@ export type CalendarEntries = {
   [key: string]: CalendarEntry[]
 };
 export type CalendarEntry = Record<string, Object>;
-export const calendarPath: string = await invoke("get_calendar_path");
 
-const getCalendarEntries = async (path: string): Promise<CalendarEntries> => {
+const getCalendarEntries = async (): Promise<CalendarEntries> => {
+  const path: string = await invoke("get_calendar_path");
   return await invoke("generate_from_file", { path: path })
     .then(entries => entries)
     .catch((error) => {
@@ -47,12 +47,13 @@ interface CalendarEntriesState {
   removeCalendarEntries: () => void;
   currentEntry: number;
   currentEntryStart: string;
-  setCurrentEntry: (entryId: number, newEntryStart: string) => void;
+  currentEntryEnd: string;
+  setCurrentEntry: (entryId: number, newEntryStart: string, newEntryEnd: string) => void;
 }
 
 export const useCalendarEntriesStore = create<CalendarEntriesState>()((set) => ({
-  calendarEntries: getCalendarEntries(calendarPath),
-  refreshEntries: () => set(() => ({ calendarEntries: getCalendarEntries(calendarPath) })),
+  calendarEntries: getCalendarEntries(),
+  refreshEntries: () => set(() => ({ calendarEntries: getCalendarEntries() })),
   addCalendarEntry: (date, entry) => set(() => ({ calendarEntries: addCalendarEntry(date, entry) })),
   entriesForRemoval: [],
   clearEntriesForRemoval: () => set(() => ({ entriesForRemoval: [] })),
@@ -67,8 +68,13 @@ export const useCalendarEntriesStore = create<CalendarEntriesState>()((set) => (
   })),
   currentEntry: 0,
   currentEntryStart: new Date().toLocaleString(),
-  setCurrentEntry: (newEntry, newEntryStart) =>
-    set(() => ({ currentEntry: newEntry, currentEntryStart: newEntryStart })),
+  currentEntryEnd: new Date().toLocaleString(),
+  setCurrentEntry: (newEntry, newEntryStart, newEntryEnd) =>
+    set(() => ({
+      currentEntry: newEntry,
+      currentEntryStart: newEntryStart,
+      currentEntryEnd: newEntryEnd,
+    })),
 }));
 
 interface TodayState {
@@ -91,24 +97,38 @@ export const useTodayStore = create<TodayState>()((set) => ({
 
 interface ElapsedTimeState {
   elapsedTime: number;
-  resumeTimes: Date[];
-  pauseTimes: Date[];
   setElapsedTime: (newElapsedTime: number) => void;
-  pushResumeTime: (resumeTime: Date) => void;
-  clearResumeTimes: () => void;
-  pushPauseTime: (pauseTime: Date) => void;
-  clearPauseTimes: () => void;
 }
 
 export const useElapsedTimeStore = create<ElapsedTimeState>()((set) => ({
   elapsedTime: 0,
+  setElapsedTime: (newElapsedTime) => set(() => ({ elapsedTime: newElapsedTime })),
+}));
+
+interface ActualElapsedTimeState {
+  actualElapsedTime: number;
+  resumeTimes: Date[];
+  pauseTimes: Date[];
+  isRunning: boolean;
+  setActualElapsedTime: (newActualElapsedTime: number) => void;
+  pushResumeTime: (resumeTime: Date) => void;
+  clearResumeTimes: () => void;
+  pushPauseTime: (pauseTime: Date) => void;
+  clearPauseTimes: () => void;
+  setIsRunning: () => void;
+}
+
+export const useActualElapsedTimeStore = create<ActualElapsedTimeState>()((set) => ({
+  actualElapsedTime: 0,
   resumeTimes: [],
   pauseTimes: [],
-  setElapsedTime: (newElapsedTime) => set(() => ({ elapsedTime: newElapsedTime })),
+  isRunning: false,
+  setActualElapsedTime: (newActualElapsedTime) => set(() => ({ actualElapsedTime: newActualElapsedTime })),
   pushResumeTime: (resumeTime) => set((state) => ({ resumeTimes: [...state.resumeTimes, resumeTime] })),
   clearResumeTimes: () => set(() => ({ resumeTimes: [] })),
   pushPauseTime: (pauseTime) => set((state) => ({ pauseTimes: [...state.pauseTimes, pauseTime] })),
   clearPauseTimes: () => set(() => ({ pauseTimes: [] })),
+  setIsRunning: () => set((state) => ({ isRunning: !state.isRunning })),
 }));
 
 interface RefreshEntriesState {

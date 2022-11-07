@@ -1,15 +1,10 @@
 import { Flex, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useElapsedTimeStore } from "../utils/GlobalState";
+import { useActualElapsedTimeStore } from "../utils/GlobalState";
+import { TimerProps } from "./Timer";
 
-export type ActualTimerProps = {
-  timerTitle: string,
-  isRunning: boolean,
-};
-
-export const ActualTimer = ({ timerTitle, isRunning }: ActualTimerProps): JSX.Element => {
-  const [elapsedTime, setElapsedTime] = useElapsedTimeStore(state =>
-    [state.elapsedTime, state.setElapsedTime])
+export const ActualTimer = ({ timerTitle }: TimerProps): JSX.Element => {
+  const actualElapsedTime = useActualElapsedTimeStore(state => state.actualElapsedTime);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -23,21 +18,15 @@ export const ActualTimer = ({ timerTitle, isRunning }: ActualTimerProps): JSX.El
     setShownTime(time);
   };
 
-  const getTime = () => {
-    if (isRunning) {
-      setElapsedTime(elapsedTime + 1);
-      setSeconds(Math.floor(elapsedTime % 60));
-      setMinutes(Math.floor(elapsedTime / 60 % 60));
-      setHours(Math.floor(elapsedTime / 60 / 60));
-      recalculateShownTime();
-    }
-  };
-
   useEffect(() => {
-    const interval = setInterval(() => getTime(), 1000);
-    return () => clearInterval(interval);
-  });
-
+    setSeconds(Math.floor(actualElapsedTime % 60));
+    setMinutes(Math.floor(actualElapsedTime / 60 % 60));
+    setHours(Math.floor(actualElapsedTime / 60 / 60));
+    recalculateShownTime();
+    if (actualElapsedTime === 0) {
+      setShownTime("00:00");
+    }
+  }, [actualElapsedTime]);
 
   return (
     <>

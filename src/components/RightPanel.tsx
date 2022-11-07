@@ -1,31 +1,31 @@
 import { Flex } from "@chakra-ui/react";
-import { useState } from "react";
 import { Timer, TimerProps } from "./Timer";
-import { ActualTimer, ActualTimerProps } from "./ActualTimer";
+import { ActualTimer } from "./ActualTimer";
 import { ResumeButton } from "./ResumeButton";
 import { PauseButton } from "./PauseButton";
 import { useColorMode } from "@chakra-ui/react";
 import { ThemeToggler } from "./ThemeToggler";
-import { useElapsedTimeStore } from "../utils/GlobalState";
+import { useActualElapsedTimeStore } from "../utils/GlobalState";
 
 const RightPanel = () => {
-  const [isRunning, setRunning] = useState(false);
+  const [isRunning, setIsRunning] = useActualElapsedTimeStore(state =>
+    [state.isRunning, state.setIsRunning]);
   const { colorMode, toggleColorMode } = useColorMode();
-  const [pushResumeTime, pushStopTime] = useElapsedTimeStore(state =>
+  const [pushResumeTime, pushStopTime] = useActualElapsedTimeStore(state =>
     [state.pushResumeTime, state.pushPauseTime]);
 
   const setResumed = () => {
     if (!isRunning) {
       pushResumeTime(new Date());
+      setIsRunning();
     }
-    setRunning(true);
   }
 
   const setPaused = () => {
     if (isRunning) {
       pushStopTime(new Date());
+      setIsRunning();
     }
-    setRunning(false);
   }
 
   let timerProps = {
@@ -34,8 +34,7 @@ const RightPanel = () => {
 
   let timerPropsActual = {
     timerTitle: "Actual",
-    isRunning: isRunning,
-  } as ActualTimerProps;
+  } as TimerProps;
 
   return (
     <div className="right-panel panel">

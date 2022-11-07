@@ -10,14 +10,14 @@ pub async fn get_entries_from_file(path: &Path) -> CommandResult<String> {
     Ok(fs::read_to_string(path).await.expect("Can read file"))
 }
 
-pub fn entries_to_json(entries: &str) -> CommandResult<CalendarEntries> {
+pub fn entries_from_json(entries: &str) -> CommandResult<CalendarEntries> {
     Ok(serde_json::from_str(entries).expect("Converted to json"))
 }
 
 #[tauri::command]
 pub async fn generate_from_file(path: &Path) -> CommandResult<CalendarEntries> {
     let entries = get_entries_from_file(path);
-    entries_to_json(&entries.await?)
+    entries_from_json(&entries.await?)
 }
 
 #[tauri::command]
@@ -40,7 +40,14 @@ pub async fn add_entry_for_date(
     entries
         .entry(date)
         .or_insert_with(Vec::new)
-        .push(entry.clone());
+        .push(entry);
+    entries = entries
+        .into_iter()
+        .map(|(day, mut day_entries)| {
+            day_entries.sort_by(|a, b| a.start.cmp(&b.start));
+            (day, day_entries)
+        })
+        .collect::<CalendarEntries>();
     save_to_file(&calendar_path, &entries).await?;
     Ok(entries)
 }
@@ -49,10 +56,13 @@ pub async fn add_entry_for_date(
 pub async fn remove_entry_by_ids(ids: Vec<i64>) -> CommandResult<CalendarEntries> {
     let calendar_path = get_calendar_path_buf().unwrap();
     let mut entries = generate_from_file(&calendar_path).await?;
-    entries = entries.into_iter().map(|(day, mut day_entries)| {
-        day_entries.retain(|entry| !ids.contains(&entry.id));
-        (day, day_entries)
-    }).collect::<CalendarEntries>();
+    entries = entries
+        .into_iter()
+        .map(|(day, mut day_entries)| {
+            day_entries.retain(|entry| !ids.contains(&entry.id));
+            (day, day_entries)
+        })
+        .collect::<CalendarEntries>();
     save_to_file(&calendar_path, &entries).await?;
     Ok(entries)
 }

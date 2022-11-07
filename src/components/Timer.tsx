@@ -1,22 +1,42 @@
 import { Flex, Heading } from "@chakra-ui/react";
+import { invoke } from "@tauri-apps/api";
 import { useEffect, useState } from "react";
-import { useCalendarEntriesStore, useShouldRefreshStore, useTodayStore } from "../utils/GlobalState";
+import { useCalendarEntriesStore, useShouldRefreshStore, useTodayStore, useElapsedTimeStore, useActualElapsedTimeStore } from "../utils/GlobalState";
 
 export type TimerProps = {
   timerTitle: string,
 };
 
 export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
-  const [elapsedTime, setElapsedTime] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [shownTime, setShownTime] = useState("00:00");
   const [dailyEntries, setDailyEntries] = useState([]);
-  const [entries, currentEntryStart, setCurrentEntry] = useCalendarEntriesStore(state =>
-    [state.calendarEntries, state.currentEntryStart, state.setCurrentEntry]);
+  const [shouldSaveStats, setShouldSaveStats] = useState(false);
+  const [entries, currentEntry, currentEntryStart, currentEntryEnd, setCurrentEntry] = useCalendarEntriesStore(state =>
+    [state.calendarEntries, state.currentEntry, state.currentEntryStart, state.currentEntryEnd, state.setCurrentEntry]);
   const shouldRefresh = useShouldRefreshStore(state => state.shouldRefresh);
   const todayShowable = useTodayStore(state => state.todayShowable);
+  const [elapsedTime, setElapsedTime] = useElapsedTimeStore(state =>
+    [state.elapsedTime, state.setElapsedTime]);
+  const [actualElapsedTime,
+    setActualElapsedTime,
+    isRunning,
+    setIsRunning,
+    resumeTimes,
+    pauseTimes,
+    clearResumeTimes,
+    clearPauseTimes] =
+    useActualElapsedTimeStore(state =>
+      [state.actualElapsedTime,
+      state.setActualElapsedTime,
+      state.isRunning,
+      state.setIsRunning,
+      state.resumeTimes,
+      state.pauseTimes,
+      state.clearResumeTimes,
+      state.clearPauseTimes]);
 
   const recalculateShownTime = () => {
     let shownHours = hours > 0 ? hours < 10 ? "0" + hours + ":" : hours + ":" : "";
@@ -31,18 +51,20 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
   const getTime = () => {
     let startDate = new Date(currentEntryStart);
     let isActive: boolean[] = [];
-    dailyEntries.forEach(entry => {
+    dailyEntries !== undefined ? dailyEntries.forEach(entry => {
       const start = new Date(entry["start"]).getTime();
       const end = new Date(entry["end"]).getTime();
       const now = new Date().getTime();
       const shouldBeActive = start < now && now < end;
       isActive.push(shouldBeActive);
-      shouldBeActive ? setCurrentEntry(entry["id"], entry["start"]) : () => { };
-    });
+      shouldBeActive ? setCurrentEntry(entry["id"], entry["start"], entry["end"]) : () => { };
+    }) : {};
     const shouldAnyBeActive = !checker(isActive);
-    shouldAnyBeActive ? () => { } : setCurrentEntry(0, "not_date");
+    shouldAnyBeActive ? () => { } : setCurrentEntry(0, "not_date", "not_date");
 
+    setShouldSaveStats((new Date(currentEntryEnd).getTime() - Date.now()) / 1000 < 2);
     setElapsedTime(Date.now() - startDate.getTime());
+    setActualElapsedTime(isRunning ? actualElapsedTime + 1 : actualElapsedTime);
     setSeconds(Math.floor(elapsedTime / 1000 % 60));
     setMinutes(Math.floor(elapsedTime / 1000 / 60 % 60));
     setHours(Math.floor(elapsedTime / 1000 / 60 / 60));
@@ -53,15 +75,51 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     }
   };
 
+  interface Statistics {
+    id: number,
+    total_duration: number,
+    total_actual_duration: number,
+    efficiency: number,
+    resume_times: Date[],
+    pause_times: Date[],
+  }
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const saveStatistics = async () => {
+    const statistics: Statistics = {
+      id: currentEntry,
+      total_duration: Math.floor(elapsedTime / 1000) + 2,
+      total_actual_duration: actualElapsedTime + 2,
+      efficiency: actualElapsedTime / Math.floor(elapsedTime / 1000),
+      resume_times: resumeTimes,
+      pause_times: pauseTimes,
+    };
+    await invoke("add_stats_for_date", { date: todayShowable, stats: statistics });
+    const resetActualTimer = async () => {
+      await sleep(2000);
+      setIsRunning();
+      setActualElapsedTime(0);
+      clearResumeTimes();
+      clearPauseTimes();
+    };
+    resetActualTimer();
+  };
+
   useEffect(() => {
     const interval = setInterval(() => getTime(), 1000);
     return () => clearInterval(interval);
   });
 
-
   useEffect(() => {
     entries.then((entries: any) => setDailyEntries(entries[todayShowable]));
   }, [todayShowable, shouldRefresh]);
+
+  useEffect(() => {
+    const execute = shouldSaveStats ? async () => {
+      await saveStatistics();
+    } : () => { };
+    execute();
+  }, [shouldSaveStats]);
 
   return (
     <>

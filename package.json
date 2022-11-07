@@ -17,6 +17,7 @@
     "@tauri-apps/api": "^1.1.0",
     "framer-motion": "^6.5.1",
     "react": "^18.2.0",
+    "react-datetime-picker": "^4.0.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.39.1",
     "zustand": "^4.1.4"

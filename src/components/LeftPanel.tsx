@@ -9,7 +9,7 @@ import { CalendarEntry } from "./CalendarEntry";
 import { RefreshButton } from "./RefreshButton";
 import { AddEntryButton } from "./AddEntryButton";
 import { RemoveEntryButton } from "./RemoveEntryButton";
-import { WebviewWindow, appWindow } from "@tauri-apps/api/window";
+import { WebviewWindow } from "@tauri-apps/api/window";
 
 const LeftPanel = () => {
   const [dailyEntries, setDailyEntries] = useState<CalendarEntry[]>([]);
@@ -21,7 +21,6 @@ const LeftPanel = () => {
   const [shouldRefresh, setShouldRefresh] = useShouldRefreshStore(state =>
     [state.shouldRefresh, state.setShouldRefresh]);
   const removeCalendarEntries = useCalendarEntriesStore(state => state.removeCalendarEntries);
-
 
   const setNextDay = () => {
     let nextDay = new Date(today.setHours(today.getHours() + 24));
@@ -63,7 +62,11 @@ const LeftPanel = () => {
   }
 
   useEffect(() => {
-    entries.then((entries: any) => setDailyEntries(entries[todayShowable]));
+    entries.then((entries: any) => {
+      const entriesToShow = entries[todayShowable] !== undefined ?
+        entries[todayShowable] : [];
+      setDailyEntries(entriesToShow);
+    });
   }, [today, shouldRefresh]);
 
   return (

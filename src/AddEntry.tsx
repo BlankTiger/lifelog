@@ -26,9 +26,7 @@ const AddEntry = () => {
     entry.end = new Date(entry.end);
     addCalendarEntry(today, entry as CalendarEntry);
     setShouldRefresh();
-    console.log(entry);
   };
-
 
   return (
     <div className="container">
@@ -40,9 +38,17 @@ const AddEntry = () => {
             <FormLabel mt={4}>{"Description"}</FormLabel>
             <Textarea {...register("description")} isRequired></Textarea>
             <FormLabel mt={4}>{"Start date"}</FormLabel>
-            <Input {...register("start")} isRequired type="datetime-local"></Input>
+            <Input
+              {...register("start")}
+              isRequired
+              type="datetime-local"
+            />
             <FormLabel mt={4}>{"End date"}</FormLabel>
-            <Input {...register("end")} isRequired type="datetime-local"></Input>
+            <Input
+              {...register("end")}
+              isRequired
+              type="datetime-local"
+            />
             <FormLabel mt={4}>{"Location"}</FormLabel>
             <Input {...register("location")} isRequired type="text"></Input>
             <FormLabel mt={4}>{"Status"}</FormLabel>
