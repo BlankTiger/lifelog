@@ -67,8 +67,8 @@ export const useCalendarEntriesStore = create<CalendarEntriesState>()((set) => (
       removeCalendarEntries(state.entriesForRemoval, state.clearEntriesForRemoval)
   })),
   currentEntry: 0,
-  currentEntryStart: new Date().toLocaleString(),
-  currentEntryEnd: new Date().toLocaleString(),
+  currentEntryStart: new Date().toISOString(),
+  currentEntryEnd: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
   setCurrentEntry: (newEntry, newEntryStart, newEntryEnd) =>
     set(() => ({
       currentEntry: newEntry,

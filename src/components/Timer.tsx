@@ -7,6 +7,17 @@ export type TimerProps = {
   timerTitle: string,
 };
 
+export interface Statistics {
+  id: number,
+  total_duration: number,
+  total_actual_duration: number,
+  efficiency: number,
+  resume_times: Date[],
+  pause_times: Date[],
+}
+
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -14,8 +25,20 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
   const [shownTime, setShownTime] = useState("00:00");
   const [dailyEntries, setDailyEntries] = useState([]);
   const [shouldSaveStats, setShouldSaveStats] = useState(false);
-  const [entries, currentEntry, currentEntryStart, currentEntryEnd, setCurrentEntry] = useCalendarEntriesStore(state =>
-    [state.calendarEntries, state.currentEntry, state.currentEntryStart, state.currentEntryEnd, state.setCurrentEntry]);
+  const [
+    entries,
+    currentEntry,
+    currentEntryStart,
+    currentEntryEnd,
+    setCurrentEntry
+  ] = useCalendarEntriesStore(state =>
+    [
+      state.calendarEntries,
+      state.currentEntry,
+      state.currentEntryStart,
+      state.currentEntryEnd,
+      state.setCurrentEntry
+    ]);
   const shouldRefresh = useShouldRefreshStore(state => state.shouldRefresh);
   const todayShowable = useTodayStore(state => state.todayShowable);
   const [elapsedTime, setElapsedTime] = useElapsedTimeStore(state =>
@@ -77,15 +100,6 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     }
   };
 
-  interface Statistics {
-    id: number,
-    total_duration: number,
-    total_actual_duration: number,
-    efficiency: number,
-    resume_times: Date[],
-    pause_times: Date[],
-  }
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   const saveStatistics = async () => {
     if (currentEntry === 0) {
@@ -93,9 +107,9 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
     }
     const statistics: Statistics = {
       id: currentEntry,
-      total_duration: Math.floor(elapsedTime / 1000) + 2,
+      total_duration: elapsedTime / 1000 + 2,
       total_actual_duration: actualElapsedTime + 2,
-      efficiency: actualElapsedTime / Math.floor(elapsedTime / 1000),
+      efficiency: 100 * ((actualElapsedTime + 2) / (elapsedTime / 1000 + 2)),
       resume_times: resumeTimes,
       pause_times: pauseTimes,
     };
@@ -104,9 +118,9 @@ export const Timer = ({ timerTitle }: TimerProps): JSX.Element => {
       if (isRunning) {
         await sleep(2000);
         setIsRunning();
-        setActualElapsedTime(0);
         clearResumeTimes();
         clearPauseTimes();
+        setActualElapsedTime(0);
       }
     };
     resetActualTimer();

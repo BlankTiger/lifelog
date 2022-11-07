@@ -34,7 +34,7 @@ export const Entry = (props: CalendarEntry): JSX.Element => {
     <AccordionItem
       key={props.id}
       border="1px"
-      bgGradient={active ? "linear(30deg, #43cea2, #185a9d)" : ""}
+      bgGradient={active ? "linear(to-l, #DA4453, #89216B)" : ""}
       rounded={15}>
       <Heading>
         <AccordionButton fontWeight="bold">

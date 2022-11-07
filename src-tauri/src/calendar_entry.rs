@@ -37,10 +37,7 @@ pub async fn add_entry_for_date(
 ) -> CommandResult<CalendarEntries> {
     let calendar_path = get_calendar_path_buf().unwrap();
     let mut entries = generate_from_file(&calendar_path).await?;
-    entries
-        .entry(date)
-        .or_insert_with(Vec::new)
-        .push(entry);
+    entries.entry(date).or_insert_with(Vec::new).push(entry);
     entries = entries
         .into_iter()
         .map(|(day, mut day_entries)| {
@@ -65,6 +62,24 @@ pub async fn remove_entry_by_ids(ids: Vec<i64>) -> CommandResult<CalendarEntries
         .collect::<CalendarEntries>();
     save_to_file(&calendar_path, &entries).await?;
     Ok(entries)
+}
+
+#[tauri::command]
+pub async fn get_entry_by_id(id: i64) -> CommandResult<CalendarEntry> {
+    let calendar_path = get_calendar_path_buf().unwrap();
+    let mut entries = generate_from_file(&calendar_path).await?;
+    let mut found_entry = None;
+    entries = entries
+        .into_iter()
+        .map(|(day, mut day_entries)| {
+            day_entries.retain(|entry| entry.id == id);
+            if day_entries.len() == 1 {
+                found_entry = Some(day_entries[0].clone());
+            }
+            (day, day_entries)
+        })
+        .collect::<CalendarEntries>();
+    Ok(found_entry.unwrap())
 }
 
 #[tauri::command]
