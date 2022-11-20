@@ -26,8 +26,10 @@ tauri = { version = "1.1", features = ["api-all"] }
 chrono = { version = "0.4.22", features = ["serde"] }
 anyhow = "1.0.66"
 thiserror = "1.0.37"
-tokio = { version = "1.21.2", features = ["full"] }
+tokio = { version = "1.22.0", features = ["full"] }
 home = "0.5.4"
+env_logger = "0.9.3"
+log = "0.4.17"
 
 [features]
 # by default Tauri runs in production mode

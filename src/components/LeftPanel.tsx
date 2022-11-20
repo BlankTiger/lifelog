@@ -10,6 +10,7 @@ import { RefreshButton } from "./RefreshButton";
 import { AddEntryButton } from "./AddEntryButton";
 import { RemoveEntryButton } from "./RemoveEntryButton";
 import { WebviewWindow } from "@tauri-apps/api/window";
+import { invoke } from "@tauri-apps/api";
 
 const LeftPanel = () => {
   const [dailyEntries, setDailyEntries] = useState<CalendarEntry[]>([]);

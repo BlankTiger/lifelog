@@ -1,4 +1,4 @@
-use crate::{calendar::EntryType, command_result::CommandResult};
+use crate::{calendar::EntryType, command_result::CommandResult, backup::backup};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -35,6 +35,7 @@ pub async fn generate_stats_from_file(path: &Path) -> CommandResult<Statistics> 
 
 #[tauri::command]
 pub async fn add_stats_for_date(date: String, stats: Stats) -> CommandResult<Statistics> {
+    backup(None).await?;
     let stats_path = get_stats_path_buf().unwrap();
     let mut statistics = generate_stats_from_file(&stats_path).await?;
     statistics.entry(date).or_insert_with(Vec::new).push(stats);
@@ -92,7 +93,6 @@ pub async fn calculate_work_hours() -> CommandResult<(f64, f64)> {
     Ok((total_actual_hours, total_hours))
 }
 
-#[tauri::command]
 pub fn get_stats_path() -> CommandResult<String> {
     Ok(home::home_dir().unwrap().display().to_string() + "/.config/lifelog/statistics.json")
 }
@@ -104,6 +104,7 @@ fn get_stats_path_buf() -> Option<PathBuf> {
 
 #[tauri::command]
 pub async fn save_stats_to_file(path: &Path, stats: &Statistics) -> CommandResult<()> {
+    backup(None).await?;
     let mut file = fs::File::create(path).await.expect("Should create file");
     let json_string = serde_json::to_string(&stats).expect("Can convert to string");
     file.write_all(json_string.as_bytes())

@@ -38,7 +38,8 @@
         "signingIdentity": null
       },
       "resources": [
-        "/home/blanktiger/personal_projects/lifelog/add.html"
+        "../add.html",
+        "../stats.html"
       ],
       "shortDescription": "",
       "targets": "all",
