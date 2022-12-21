@@ -11,6 +11,7 @@ import { AddEntryButton } from "./AddEntryButton";
 import { RemoveEntryButton } from "./RemoveEntryButton";
 import { WebviewWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api";
+import { EditEntryButton } from "./EditEntryButton";
 
 const LeftPanel = () => {
   const [dailyEntries, setDailyEntries] = useState<CalendarEntry[]>([]);
@@ -60,7 +61,11 @@ const LeftPanel = () => {
   const removeEntries = () => {
     setShouldRefresh();
     removeCalendarEntries();
-  }
+  };
+
+  const editEntry = () => {
+    new WebviewWindow('edit', { title: "Edit entry", url: "edit.html", height: 800, width: 600 });
+  };
 
   useEffect(() => {
     entries.then((entries: any) => {
@@ -99,6 +104,7 @@ const LeftPanel = () => {
       </Flex>
       <Flex direction="row" mt={4} justify="center" align="center" gap="3vw">
         <AddEntryButton onClick={addEntry} />
+        <EditEntryButton onClick={editEntry} />
         <RemoveEntryButton onClick={removeEntries} />
       </Flex>
       <Spacer />
