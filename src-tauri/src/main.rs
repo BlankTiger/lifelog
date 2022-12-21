@@ -23,8 +23,8 @@ use lifelog::statistics::calculate_work_hours;
 use lifelog::statistics::get_stats_for_date;
 use log::LevelFilter;
 use std::io::Write;
-use tauri::Menu;
-use tauri::Submenu;
+// use tauri::Menu;
+// use tauri::Submenu;
 
 #[tokio::main]
 async fn main() {
