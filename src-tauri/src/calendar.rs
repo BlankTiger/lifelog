@@ -114,7 +114,7 @@ impl Calendar {
                 .or_insert_with(Vec::new)
                 .push(entry.clone());
         }
-        let json = serde_json::to_string(&calendar_entries).unwrap();
+        let json = serde_json::to_string_pretty(&calendar_entries).unwrap();
         let mut file = fs::File::create(path).await.expect("Should create file");
         file.write_all(json.as_bytes())
             .await

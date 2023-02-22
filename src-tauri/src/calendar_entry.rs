@@ -85,7 +85,7 @@ pub async fn get_entry_by_id(id: i64) -> CommandResult<CalendarEntry> {
 pub async fn save_to_file(path: &Path, entries: &CalendarEntries) -> CommandResult<()> {
     backup(None).await?;
     let mut file = fs::File::create(path).await.expect("Should create file");
-    let json_string = serde_json::to_string(&entries).expect("Can convert to string");
+    let json_string = serde_json::to_string_pretty(&entries).expect("Can convert to string");
     file.write_all(json_string.as_bytes())
         .await
         .expect("Should write to file");

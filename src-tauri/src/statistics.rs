@@ -106,7 +106,7 @@ fn get_stats_path_buf() -> Option<PathBuf> {
 pub async fn save_stats_to_file(path: &Path, stats: &Statistics) -> CommandResult<()> {
     backup(None).await?;
     let mut file = fs::File::create(path).await.expect("Should create file");
-    let json_string = serde_json::to_string(&stats).expect("Can convert to string");
+    let json_string = serde_json::to_string_pretty(&stats).expect("Can convert to string");
     file.write_all(json_string.as_bytes())
         .await
         .expect("Should write to file");
