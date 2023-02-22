@@ -1,14 +1,21 @@
 use serde::{ser::Serializer, Serialize};
+use thiserror::Error;
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Error)]
 pub enum CommandError {
     #[error(transparent)]
-    RusqliteError(#[from] anyhow::Error),
+    ColorEyreError(#[from] color_eyre::Report),
     #[error(transparent)]
-    IOError(#[from] FsError),
+    FsError(#[from] FsError),
+    #[error(transparent)]
+    IOError(#[from] std::io::Error),
+    #[error("App error: {0}")]
+    AppError(String),
+    #[error(transparent)]
+    JsonError(#[from] serde_json::Error),
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Error)]
 pub enum FsError {
     #[error(transparent)]
     IOError(#[from] std::io::Error),
@@ -32,5 +39,5 @@ impl Serialize for FsError {
     }
 }
 
-pub type CommandResult<T, E = CommandError> = anyhow::Result<T, E>;
-pub type FsResult<T, E = FsError> = anyhow::Result<T, E>;
+pub type CommandResult<T, E = CommandError> = color_eyre::Result<T, E>;
+pub type FsResult<T, E = FsError> = color_eyre::Result<T, E>;

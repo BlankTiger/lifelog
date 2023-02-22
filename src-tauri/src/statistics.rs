@@ -1,5 +1,6 @@
-use crate::{calendar::EntryType, command_result::CommandResult, backup::backup};
+use crate::{backup::backup, calendar::EntryType, command_result::CommandResult};
 use chrono::{DateTime, Utc};
+use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
@@ -20,11 +21,11 @@ pub struct Stats {
 type Statistics = HashMap<String, Vec<Stats>>;
 
 pub async fn get_stats_from_file(path: &Path) -> CommandResult<String> {
-    Ok(fs::read_to_string(path).await.expect("Can read file"))
+    Ok(fs::read_to_string(path).await?)
 }
 
 pub fn stats_from_json(statistics: &str) -> CommandResult<Statistics> {
-    Ok(serde_json::from_str(statistics).expect("Converted to json"))
+    Ok(serde_json::from_str(statistics)?)
 }
 
 #[tauri::command]
@@ -36,7 +37,7 @@ pub async fn generate_stats_from_file(path: &Path) -> CommandResult<Statistics> 
 #[tauri::command]
 pub async fn add_stats_for_date(date: String, stats: Stats) -> CommandResult<Statistics> {
     backup(None).await?;
-    let stats_path = get_stats_path_buf().unwrap();
+    let stats_path = get_stats_path_buf()?;
     let mut statistics = generate_stats_from_file(&stats_path).await?;
     statistics.entry(date).or_insert_with(Vec::new).push(stats);
     save_stats_to_file(&stats_path, &statistics).await?;
@@ -45,7 +46,7 @@ pub async fn add_stats_for_date(date: String, stats: Stats) -> CommandResult<Sta
 
 #[tauri::command]
 pub async fn get_stats_for_date(date: String) -> CommandResult<Vec<Stats>> {
-    let stats_path = get_stats_path_buf().unwrap();
+    let stats_path = get_stats_path_buf()?;
     let statistics = generate_stats_from_file(&stats_path).await?;
     Ok(match statistics.get(&date) {
         Some(stats) => stats.clone(),
@@ -55,7 +56,7 @@ pub async fn get_stats_for_date(date: String) -> CommandResult<Vec<Stats>> {
 
 #[tauri::command]
 pub async fn calculate_work_hours() -> CommandResult<(f64, f64)> {
-    let stats_path = get_stats_path_buf().unwrap();
+    let stats_path = get_stats_path_buf()?;
     let statistics = generate_stats_from_file(&stats_path).await?;
     let today = chrono::Utc::now()
         .to_string()
@@ -94,21 +95,23 @@ pub async fn calculate_work_hours() -> CommandResult<(f64, f64)> {
 }
 
 pub fn get_stats_path() -> CommandResult<String> {
-    Ok(home::home_dir().unwrap().display().to_string() + "/.config/lifelog/statistics.json")
+    Ok(home::home_dir()
+        .ok_or(eyre!("Couldn't get home dir"))?
+        .display()
+        .to_string()
+        + "/.config/lifelog/statistics.json")
 }
 
-fn get_stats_path_buf() -> Option<PathBuf> {
-    let calendar_path_str = get_stats_path().expect("Can get calendar path");
-    Some(PathBuf::from(&calendar_path_str))
+fn get_stats_path_buf() -> CommandResult<PathBuf> {
+    let calendar_path_str = get_stats_path()?;
+    Ok(PathBuf::from(&calendar_path_str))
 }
 
 #[tauri::command]
 pub async fn save_stats_to_file(path: &Path, stats: &Statistics) -> CommandResult<()> {
     backup(None).await?;
-    let mut file = fs::File::create(path).await.expect("Should create file");
-    let json_string = serde_json::to_string_pretty(&stats).expect("Can convert to string");
-    file.write_all(json_string.as_bytes())
-        .await
-        .expect("Should write to file");
+    let mut file = fs::File::create(path).await?;
+    let json_string = serde_json::to_string_pretty(&stats)?;
+    file.write_all(json_string.as_bytes()).await?;
     Ok(())
 }
