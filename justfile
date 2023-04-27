@@ -4,7 +4,10 @@ default:
 push:
 	#!/bin/zsh
 	cd ~/.config/lifelog
+	pwd
 	git add .
 	git commit -m "$(date)"
 	git push
-	cd -
+
+run:
+	npm run tauri dev
